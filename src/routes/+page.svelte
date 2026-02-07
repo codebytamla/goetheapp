@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool, Target } from "@lucide/svelte";
+	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool, Target, TrendingUp, Calendar, ArrowRight, CheckCircle2 } from "@lucide/svelte";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
@@ -16,40 +16,40 @@
 			id: "lesen",
 			name: "Lesen",
 			subtitle: "Reading",
-			description: "Master text comprehension with authentic Goethe-style passages",
-			tasks: "5 Teile",
-			duration: "65 min",
-			skills: ["Headline matching", "Detail extraction", "Multiple choice"],
+			progress: 35,
+			total: 20,
+			completed: 7,
+			lastSession: "2h ago",
 			accent: "reading"
 		},
 		{
 			id: "hoeren",
 			name: "Hören",
 			subtitle: "Listening",
-			description: "Train your ear with announcements, dialogues, and interviews",
-			tasks: "4 Teile",
-			duration: "40 min",
-			skills: ["Keyword capture", "Note-taking", "Speaker identification"],
+			progress: 60,
+			total: 15,
+			completed: 9,
+			lastSession: "Yesterday",
 			accent: "listening"
 		},
 		{
 			id: "schreiben",
 			name: "Schreiben",
 			subtitle: "Writing",
-			description: "Perfect your formal emails and argumentative essays",
-			tasks: "2 Teile",
-			duration: "75 min",
-			skills: ["Formal register", "Connectors", "Paragraph structure"],
+			progress: 10,
+			total: 10,
+			completed: 1,
+			lastSession: "3 days ago",
 			accent: "writing"
 		},
 		{
 			id: "sprechen",
 			name: "Sprechen",
 			subtitle: "Speaking",
-			description: "Simulate the oral exam with AI-powered feedback",
-			tasks: "3 Teile",
-			duration: "15 min",
-			skills: ["Fluency", "Pronunciation", "Argument structure"],
+			progress: 0,
+			total: 12,
+			completed: 0,
+			lastSession: "Not started",
 			accent: "speaking"
 		}
 	];
@@ -89,11 +89,13 @@
 		</div>
 	</div>
 {:else}
-	<div class="app-container">
+	<div class="app-shell">
 		<!-- Navigation -->
-		<nav class="nav">
+		<nav class="app-nav">
 			<div class="nav-brand">
-				<span class="nav-logo"><Languages size={20} aria-hidden="true" /></span>
+				<div class="nav-logo-circle">
+					<Languages size={20} aria-hidden="true" />
+				</div>
 				<span class="nav-title">Goethe Trainer</span>
 			</div>
 			<div class="nav-links">
@@ -102,89 +104,101 @@
 				<a href="/mock-exam" class="nav-link">Mock Exam</a>
 			</div>
 			<div class="nav-user">
-				<span class="nav-user-name">{data.user?.name ?? data.user?.email?.split('@')[0] ?? "Learner"}</span>
-				<a href="/auth" class="btn btn-ghost">Account</a>
+				<div class="user-streak">
+					<TrendingUp size={16} style="color: #16a34a;" />
+					<span>3 Day Streak</span>
+				</div>
+				<div class="nav-divider"></div>
+				<a href="/auth" class="user-profile">
+					<div class="avatar">
+						{data.user?.name?.[0] || "L"}
+					</div>
+				</a>
 			</div>
 		</nav>
 
-		<!-- Mock Exam CTA -->
-		<section class="mock-exam-section">
-			<div class="mock-exam-card">
-				<div class="mock-exam-content">
-					<span class="mock-exam-badge">Full Simulation</span>
-					<h2>Ready for a Mock Exam?</h2>
-					<p>Take a complete Goethe B1 simulation with all four modules under real exam conditions.</p>
-					<div class="mock-exam-info">
-						<span><Clock3 size={14} aria-hidden="true" /> ~3.5 hours</span>
-						<span><ListChecks size={14} aria-hidden="true" /> All 4 modules</span>
-						<span><Target size={14} aria-hidden="true" /> CEFR assessment</span>
+		<main class="dashboard-content">
+			<!-- Dashboard Header -->
+			<header class="dashboard-header">
+				<div class="header-welcome">
+					<h1>Guten Tag, {data.user?.name ?? "Learner"}</h1>
+					<p>Ready to continue your B1 preparation?</p>
+				</div>
+				<div class="header-stats">
+					<div class="stat-card">
+						<span class="stat-label">CEFR Level</span>
+						<span class="stat-value">B1</span>
+					</div>
+					<div class="stat-card">
+						<span class="stat-label">Exam Date</span>
+						<span class="stat-value text-muted">Set Date</span>
 					</div>
 				</div>
-				<a href="/mock-exam" class="btn btn-primary btn-lg">Start Mock Exam</a>
-			</div>
-		</section>
+			</header>
 
-		<!-- Modules Section -->
-		<section class="modules-section">
-			<div class="section-header">
-			<!-- <span class="mock-exam-badge">Modules</span> -->
-				<!-- <h2>Modules</h2> -->
-				<!-- <p>Choose a module to practice or take a full mock exam</p> -->
-			</div>
+			<!-- Mock Exam Banner (Slim) -->
+			<section class="mock-exam-banner">
+				<div class="mock-exam-info">
+					<div class="mock-icon">
+						<Clock3 size={24} />
+					</div>
+					<div class="mock-text">
+						<h3>Full Mock Exam</h3>
+						<p>Simulate the real test conditions (approx. 3.5h)</p>
+					</div>
+				</div>
+				<a href="/mock-exam" class="btn btn-secondary btn-sm">Start Simulation</a>
+			</section>
 
+			<!-- Modules Grid -->
 			<div class="modules-grid">
-				{#each modules as mod, i}
+				{#each modules as mod}
 					{@const Icon = moduleIcons[mod.id]}
-					<a
-						href="/{mod.id}"
-						class="module-card {mod.accent}"
-						style="animation-delay: {i * 80}ms"
-					>
-						<div class="module-header">
-							<span class="module-icon">
-								<Icon size={30} aria-hidden="true" />
+					<div class="module-widget">
+						<div class="widget-header">
+							<div class="widget-icon {mod.accent}">
+								<Icon size={24} />
+							</div>
+							<div class="widget-title">
+								<h3>{mod.name}</h3>
+								<span class="widget-subtitle">{mod.subtitle}</span>
+							</div>
+							<!-- <div class="widget-meta">
+								<span>{mod.completed}/{mod.total}</span>
+							</div> -->
+						</div>
+						
+						<!-- <div class="widget-progress">
+							<div class="progress-bar">
+								<div class="progress-fill {mod.accent}" style="width: {mod.progress}%"></div>
+							</div>
+						</div> -->
+
+						<div class="widget-footer">
+							<span class="last-session">
+								<Clock3 size={14} />
+								{mod.lastSession}
 							</span>
+							<a href="/{mod.id}" class="btn btn-ghost btn-sm action-btn">
+								Practice
+								<ArrowRight size={16} />
+							</a>
 						</div>
-
-						<div class="module-body">
-							<h3 class="module-name">{mod.name}</h3>
-							<p class="module-subtitle">{mod.subtitle}</p>
-							<p class="module-description">{mod.description}</p>
-						</div>
-
-						<div class="module-meta">
-							<span class="meta-item">
-								<ListChecks size={14} aria-hidden="true" />
-								{mod.tasks}
-							</span>
-							<span class="meta-item">
-								<Clock3 size={14} aria-hidden="true" />
-								{mod.duration}
-							</span>
-						</div>
-
-						<!--
-						<div class="module-skills">
-							{#each mod.skills as skill}
-								<span class="skill-tag">{skill}</span>
-							{/each}
-						</div>
-						-->
-
-						<div class="module-cta">
-							<span>Start Practice</span>
-							<span class="cta-arrow">→</span>
-						</div>
-					</a>
+					</div>
 				{/each}
 			</div>
-		</section>
 
+			<!-- Recent Activity / Quick Actions (Optional placeholder) -->
+			<!-- <div class="recent-section">
+				<h3>Recent Activity</h3>
+				...
+			</div> -->
+		</main>
 	</div>
 {/if}
 
 <style>
-	/* === Landing Page === */
+	/* === Landing Page (Unchanged) === */
 	.landing {
 		min-height: 100vh;
 		display: flex;
@@ -328,63 +342,65 @@
 	.landing-module-pill.writing { border-color: var(--writing-glow); }
 	.landing-module-pill.speaking { border-color: var(--speaking-glow); }
 
-	/* === App Container === */
-	.app-container {
+	/* === App Shell (Dashboard) === */
+	.app-shell {
 		min-height: 100vh;
-		padding: var(--space-lg);
-		max-width: 1400px;
-		margin: 0 auto;
+		background: var(--bg-primary);
+		padding-bottom: var(--space-2xl);
 	}
 
-	/* === Navigation === */
-	.nav {
+	.app-nav {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: rgba(255, 255, 255, 0.9);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--border-subtle);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-lg);
-		padding: var(--space-md) var(--space-lg);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
-		margin-bottom: var(--space-xl);
-		animation: slideDown 0.5s ease forwards;
+		padding: 0.75rem var(--space-lg);
+		margin-bottom: var(--space-lg);
 	}
 
 	.nav-brand {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: 0.75rem;
 	}
 
-	.nav-logo {
-		font-size: 1.5rem;
+	.nav-logo-circle {
+		width: 36px;
+		height: 36px;
+		background: var(--bg-elevated);
+		border-radius: var(--radius-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--text-primary);
 	}
 
 	.nav-title {
-		font-family: var(--font-heading);
 		font-weight: 700;
-		font-size: 1.125rem;
+		font-size: 1.1rem;
+		letter-spacing: -0.01em;
 	}
 
 	.nav-links {
 		display: flex;
-		gap: var(--space-xs);
+		gap: 0.25rem;
 	}
 
 	.nav-link {
-		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
+		font-size: 0.9rem;
 		font-weight: 500;
 		color: var(--text-secondary);
-		transition: all var(--transition-fast);
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius-sm);
+		transition: all 0.2s;
 	}
 
-	.nav-link:hover {
-		color: var(--text-primary);
-		background: var(--bg-elevated);
-	}
-
-	.nav-link.active {
+	.nav-link:hover, .nav-link.active {
 		color: var(--text-primary);
 		background: var(--bg-elevated);
 	}
@@ -392,280 +408,254 @@
 	.nav-user {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		gap: 1rem;
 	}
 
-	.nav-user-name {
-		font-weight: 500;
-		color: var(--text-secondary);
-	}
-
-	/* === Modules Section === */
-	.modules-section {
-		animation: slideUp 0.6s ease forwards;
-		opacity: 0;
-		animation-fill-mode: forwards;
-	}
-
-	.section-header {
+	.user-streak {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-bottom: var(--space-xl);
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-secondary);
+		background: var(--bg-elevated);
+		padding: 0.25rem 0.75rem;
+		border-radius: var(--radius-full);
 	}
 
-	.section-header h2 {
-		margin: 0;
+	.nav-divider {
+		width: 1px;
+    height: 24px;
+    background: var(--border-default);
 	}
 
-	.section-header p {
-		margin: var(--space-xs) 0 0;
-	}
-
-	.modules-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: var(--space-lg);
-	}
-
-	.module-card {
+	.avatar {
+		width: 36px;
+		height: 36px;
+		background: #2563eb;
+		color: white;
+		border-radius: 50%;
 		display: flex;
-		flex-direction: column;
-		padding: var(--space-xl);
-		background: #ffffff;
-		border: 1px solid rgba(15, 23, 42, 0.08);
-		border-radius: 1.75rem;
-		box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
-		transition: none;
-		animation: slideUp 0.5s ease forwards;
-		opacity: 0;
-		cursor: pointer;
-		text-decoration: none;
-	}
-
-	.module-header {
-		display: flex;
-		justify-content: flex-start;
-		align-items: flex-start;
-		margin-bottom: var(--space-lg);
-	}
-
-	.module-icon {
-		width: 64px;
-		height: 64px;
-		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 1rem;
-		background: var(--bg-elevated);
-		color: var(--text-primary);
+		font-weight: 600;
+		font-size: 0.9rem;
 	}
 
-	.module-card.reading .module-icon {
-		background: rgba(194, 65, 12, 0.12);
-		color: var(--reading-primary);
+	.dashboard-content {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 var(--space-lg);
 	}
 
-	.module-card.listening .module-icon {
-		background: rgba(14, 116, 144, 0.12);
-		color: var(--listening-primary);
+	.dashboard-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: var(--space-xl);
+		padding-bottom: var(--space-lg);
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
-	.module-card.writing .module-icon {
-		background: rgba(109, 40, 217, 0.12);
-		color: var(--writing-primary);
-	}
-
-	.module-card.speaking .module-icon {
-		background: rgba(15, 118, 110, 0.12);
-		color: var(--speaking-primary);
-	}
-
-	.module-body {
-		flex: 1;
-	}
-
-	.module-name {
+	.header-welcome h1 {
 		font-size: 2rem;
-		margin-bottom: 0;
+		margin-bottom: 0.25rem;
 	}
 
-	.reading .module-name { color: var(--reading-primary); }
-	.listening .module-name { color: var(--listening-primary); }
-	.writing .module-name { color: var(--writing-primary); }
-	.speaking .module-name { color: var(--speaking-primary); }
-
-	.module-subtitle {
-		font-size: 1rem;
-		color: var(--text-muted);
-		margin: var(--space-xs) 0 var(--space-md);
-	}
-
-	.module-description {
-		font-size: 1.05rem;
-		color: #283341;
-		line-height: 1.45;
-	}
-
-	.module-meta {
+	.header-stats {
 		display: flex;
 		gap: var(--space-lg);
-		margin-top: var(--space-lg);
-		padding-top: var(--space-md);
-		border-top: 1px solid var(--border-subtle);
 	}
 
-	.meta-item {
+	.stat-card {
 		display: flex;
-		align-items: center;
-		gap: var(--space-xs);
-		font-size: 1rem;
-		font-weight: 600;
-		color: #5b6472;
+		flex-direction: column;
+		align-items: flex-end;
 	}
 
-	.module-skills {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-xs);
-		margin-top: var(--space-md);
-	}
-
-	.skill-tag {
+	.stat-label {
 		font-size: 0.75rem;
-		padding: var(--space-xs) var(--space-sm);
-		background: var(--bg-elevated);
-		border-radius: var(--radius-full);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 		color: var(--text-muted);
+		font-weight: 600;
 	}
 
-	.module-cta {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-xs);
-		align-self: flex-start;
-		margin-top: var(--space-md);
-		padding: 0.42rem 0.78rem;
-		background: var(--bg-elevated);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-full);
+	.stat-value {
+		font-size: 1.25rem;
 		font-weight: 700;
-		font-size: 0.84rem;
-		letter-spacing: 0.02em;
 		color: var(--text-primary);
-		transition: none;
 	}
 
-	.module-card.reading .module-cta { color: var(--reading-primary); border-color: rgba(194, 65, 12, 0.24); }
-	.module-card.listening .module-cta { color: var(--listening-primary); border-color: rgba(14, 116, 144, 0.24); }
-	.module-card.writing .module-cta { color: var(--writing-primary); border-color: rgba(109, 40, 217, 0.24); }
-	.module-card.speaking .module-cta { color: var(--speaking-primary); border-color: rgba(15, 118, 110, 0.24); }
+	.text-muted { color: var(--text-muted); }
 
-	.cta-arrow {
-		font-size: 1rem;
-		font-weight: 800;
-	}
-
-	/* === Mock Exam Section === */
-	.mock-exam-section {
-		margin-top: var(--space-2xl);
-		animation: slideUp 0.6s ease forwards;
-		animation-delay: 0.2s;
-		opacity: 0;
-		animation-fill-mode: forwards;
-	}
-
-	.mock-exam-card {
+	/* Mock Exam Banner */
+	.mock-exam-banner {
+		background: white;
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		padding: var(--space-md) var(--space-lg);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-xl);
-		padding: var(--space-lg) var(--space-2xl);
-		background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-		border: 1px solid var(--border-default);
-		border-radius: var(--radius-xl);
-		position: relative;
-		overflow: hidden;
-	}
-
-	.mock-exam-card::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 40%;
-		height: 100%;
-		background: radial-gradient(ellipse at right, var(--writing-glow) 0%, transparent 70%);
-		opacity: 0.3;
-	}
-
-	.mock-exam-content {
-		position: relative;
-		z-index: 1;
-	}
-
-	.mock-exam-badge {
-		display: inline-block;
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		padding: var(--space-xs) var(--space-sm);
-		background: var(--writing-primary);
-		color: white;
-		border-radius: var(--radius-sm);
-		margin-bottom: var(--space-md);
-	}
-
-	.mock-exam-content h2 {
-		margin-bottom: var(--space-sm);
-	}
-
-	.mock-exam-content p {
-		max-width: 400px;
+		margin-bottom: var(--space-xl);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.mock-exam-info {
 		display: flex;
+		align-items: center;
 		gap: var(--space-lg);
-		margin-top: var(--space-md);
+	}
+
+	.mock-icon {
+		width: 48px;
+		height: 48px;
+		background: #f8fafc;
+		border-radius: var(--radius-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--text-secondary);
+	}
+
+	.mock-text h3 {
+		font-size: 1rem;
+		margin-bottom: 0.1rem;
+	}
+
+	.mock-text p {
 		font-size: 0.875rem;
+		margin: 0;
+	}
+
+	/* Modules Grid */
+	.modules-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--space-lg);
+	}
+
+	.module-widget {
+		background: white;
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		padding: var(--space-lg);
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s ease;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.module-widget:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-md);
+		border-color: var(--border-default);
+	}
+
+	.widget-header {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--space-md);
+		margin-bottom: var(--space-md);
+	}
+
+	.widget-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: var(--radius-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.widget-icon.reading { background: var(--reading-glow); color: var(--reading-primary); }
+	.widget-icon.listening { background: var(--listening-glow); color: var(--listening-primary); }
+	.widget-icon.writing { background: var(--writing-glow); color: var(--writing-primary); }
+	.widget-icon.speaking { background: var(--speaking-glow); color: var(--speaking-primary); }
+
+	.widget-title {
+		flex: 1;
+	}
+
+	.widget-title h3 {
+		font-size: 1.1rem;
+		margin: 0;
+	}
+
+	.widget-subtitle {
+		font-size: 0.8rem;
 		color: var(--text-muted);
 	}
 
-	.mock-exam-info span {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-xs);
+	.widget-meta {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--text-secondary);
+		background: var(--bg-primary);
+		padding: 2px 8px;
+		border-radius: var(--radius-full);
 	}
 
-	/* === Responsive === */
+	.widget-progress {
+		margin-bottom: var(--space-lg);
+	}
+
+	.progress-bar {
+		height: 6px;
+		background: var(--bg-elevated);
+		border-radius: var(--radius-full);
+		overflow: hidden;
+	}
+
+	.progress-fill {
+		height: 100%;
+		border-radius: var(--radius-full);
+	}
+
+	.progress-fill.reading { background: var(--reading-primary); }
+	.progress-fill.listening { background: var(--listening-primary); }
+	.progress-fill.writing { background: var(--writing-primary); }
+	.progress-fill.speaking { background: var(--speaking-primary); }
+
+	.widget-footer {
+		margin-top: auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-top: var(--space-md);
+		border-top: 1px solid var(--border-subtle);
+	}
+
+	.last-session {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.action-btn {
+		font-size: 0.8rem;
+		padding: 0.35rem 0.75rem;
+		gap: 0.25rem;
+	}
+
 	@media (max-width: 768px) {
-		.nav {
+		.app-nav {
 			flex-direction: column;
-			gap: var(--space-md);
+			gap: 1rem;
 		}
-
-		.nav-links {
-			order: 3;
-			width: 100%;
-			justify-content: center;
-		}
-
-		.mock-exam-card {
-			flex-direction: column;
-			text-align: center;
-		}
-
-		.mock-exam-info {
-			justify-content: center;
-			flex-wrap: wrap;
-		}
-
-		.section-header {
+		
+		.dashboard-header {
 			flex-direction: column;
 			align-items: flex-start;
-			gap: var(--space-md);
+			gap: 1rem;
+		}
+
+		.header-stats {
+			width: 100%;
+			justify-content: flex-start;
 		}
 	}
 </style>
