@@ -1,529 +1,693 @@
 <script lang="ts">
-	import { Progress, Separator, Tabs } from "bits-ui";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
-	const readiness = 62;
 
-	const skillTracks = [
+	const modules = [
 		{
-			id: "reading",
-			name: "Reading",
-			level: "Goethe-style texts",
-			target: "18 tasks",
-			focus: "Text structure and detail extraction",
-			accent: "reading",
-			score: "71%"
+			id: "lesen",
+			name: "Lesen",
+			subtitle: "Reading",
+			icon: "📖",
+			description: "Master text comprehension with authentic Goethe-style passages",
+			tasks: "5 Teile",
+			duration: "65 min",
+			skills: ["Headline matching", "Detail extraction", "Multiple choice"],
+			progress: 71,
+			accent: "reading"
 		},
 		{
-			id: "writing",
-			name: "Writing",
-			level: "Argument + formal email",
-			target: "2 prompts",
-			focus: "Connectors, tone, and clear paragraph flow",
-			accent: "writing",
-			score: "64%"
+			id: "hoeren",
+			name: "Hören",
+			subtitle: "Listening", 
+			icon: "🎧",
+			description: "Train your ear with announcements, dialogues, and interviews",
+			tasks: "4 Teile",
+			duration: "40 min",
+			skills: ["Keyword capture", "Note-taking", "Speaker identification"],
+			progress: 68,
+			accent: "listening"
 		},
 		{
-			id: "listening",
-			name: "Listening",
-			level: "Announcements + interviews",
-			target: "12 clips",
-			focus: "Fast keyword capture under time pressure",
-			accent: "listening",
-			score: "68%"
+			id: "schreiben",
+			name: "Schreiben",
+			subtitle: "Writing",
+			icon: "✍️",
+			description: "Perfect your formal emails and argumentative essays",
+			tasks: "2 Teile",
+			duration: "75 min",
+			skills: ["Formal register", "Connectors", "Paragraph structure"],
+			progress: 64,
+			accent: "writing"
 		},
 		{
-			id: "speaking",
-			name: "Speaking",
-			level: "Part 1-3 simulation",
-			target: "4 drills",
-			focus: "Fluency and argument structure",
-			accent: "speaking",
-			score: "59%"
+			id: "sprechen",
+			name: "Sprechen",
+			subtitle: "Speaking",
+			icon: "🎤",
+			description: "Simulate the oral exam with AI-powered feedback",
+			tasks: "3 Teile",
+			duration: "15 min",
+			skills: ["Fluency", "Pronunciation", "Argument structure"],
+			progress: 59,
+			accent: "speaking"
 		}
 	];
 
-	let activeTrack = $state("reading");
 </script>
 
 {#if !data.isAuthenticated}
-	<h1>Goethe App</h1>
-	<p>
-		Magic-link auth is available at <a href="/auth">/auth</a>.
-	</p>
-{:else}
-	<div class="app-shell">
-		<section class="hero">
-			<p class="eyebrow">Goethe Placement Test</p>
-			<h1>Willkommen, {data.user?.name ?? data.user?.email ?? "Learner"}.</h1>
-			<p>
-				Train each module, then run a full placement simulation to estimate your CEFR level from A1 to
-				C1.
+	<div class="landing">
+		<div class="landing-bg">
+			<div class="orb orb-1"></div>
+			<div class="orb orb-2"></div>
+			<div class="orb orb-3"></div>
+			<div class="orb orb-4"></div>
+		</div>
+		<div class="landing-content">
+			<p class="landing-eyebrow">Goethe Prüfung Trainer</p>
+			<h1 class="landing-title">
+				Master Your<br />
+				<span class="gradient-text">German Exam</span>
+			</h1>
+			<p class="landing-subtitle">
+				Interactive practice for all four exam modules with AI-powered feedback and real exam simulations.
 			</p>
-			<div class="hero-actions">
-				<a class="btn btn-primary" href="/auth">Open account</a>
-				<button class="btn btn-subtle" type="button">Start full test</button>
+			<div class="landing-actions">
+				<a class="btn btn-primary btn-lg" href="/auth">Get Started</a>
+				<button class="btn btn-secondary btn-lg" type="button">Learn More</button>
 			</div>
-			<div class="meter-wrap">
-				<p class="meter-title">Placement readiness</p>
-				<Progress.Root class="meter-bar" value={readiness} max={100} aria-label="Placement readiness">
-					<div class="meter-indicator" style={`width:${readiness}%`}></div>
-				</Progress.Root>
-				<p class="meter-caption">{readiness}% complete toward B1 placement confidence</p>
+			<div class="landing-modules">
+				{#each modules as mod, i}
+					<div class="landing-module-pill {mod.accent}" style="animation-delay: {i * 100}ms">
+						<span>{mod.icon}</span>
+						<span>{mod.name}</span>
+					</div>
+				{/each}
 			</div>
-		</section>
+		</div>
+	</div>
+{:else}
+	<div class="app-container">
+		<!-- Navigation -->
+		<nav class="nav">
+			<div class="nav-brand">
+				<span class="nav-logo">🇩🇪</span>
+				<span class="nav-title">Goethe Trainer</span>
+			</div>
+			<div class="nav-links">
+				<a href="/" class="nav-link active">Dashboard</a>
+				<a href="/progress" class="nav-link">Progress</a>
+				<a href="/mock-exam" class="nav-link">Mock Exam</a>
+			</div>
+			<div class="nav-user">
+				<span class="nav-user-name">{data.user?.name ?? data.user?.email?.split('@')[0] ?? "Learner"}</span>
+				<a href="/auth" class="btn btn-ghost">Account</a>
+			</div>
+		</nav>
 
-		<Separator.Root decorative class="section-rule" />
+		<!-- Modules Section -->
+		<section class="modules-section">
+			<div class="section-header">
+				<h2>Prüfungsmodule</h2>
+				<p>Choose a module to practice or take a full mock exam</p>
+			</div>
 
-		<section class="main-grid">
-			<article class="panel panel-large">
-				<div class="panel-head">
-					<h2>Skill Arena</h2>
-					<p>Build confidence across all 4 scored sections with Bits UI tabs</p>
-				</div>
-				<Tabs.Root bind:value={activeTrack} class="skill-tabs">
-					<Tabs.List class="tabs-list" aria-label="Placement modules">
-						{#each skillTracks as skill}
-							<Tabs.Trigger class={`tabs-trigger ${skill.accent}`} value={skill.id}>
-								{skill.name}
-							</Tabs.Trigger>
-						{/each}
-					</Tabs.List>
-
-					{#each skillTracks as skill}
-						<Tabs.Content class="tabs-content" value={skill.id}>
-							<div class={`skill-card ${skill.accent}`}>
-								<div>
-									<p class="track-name">{skill.name}</p>
-									<p class="track-level">{skill.level}</p>
-								</div>
-								<p class="track-focus">{skill.focus}</p>
-								<div class="track-meta">
-									<span>{skill.target}</span>
-									<strong>{skill.score}</strong>
-								</div>
-								<button type="button">Resume {skill.name}</button>
+			<div class="modules-grid">
+				{#each modules as mod, i}
+					<a 
+						href="/{mod.id}" 
+						class="module-card {mod.accent}"
+						style="animation-delay: {i * 80}ms"
+					>
+						<div class="module-header">
+							<span class="module-icon">{mod.icon}</span>
+							<div class="module-progress-ring">
+								<svg viewBox="0 0 36 36">
+									<path
+										class="ring-bg"
+										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+									/>
+									<path
+										class="ring-fill"
+										stroke-dasharray="{mod.progress}, 100"
+										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+									/>
+								</svg>
+								<span class="ring-value">{mod.progress}%</span>
 							</div>
-						</Tabs.Content>
-					{/each}
-				</Tabs.Root>
-			</article>
+						</div>
+						
+						<div class="module-body">
+							<h3 class="module-name">{mod.name}</h3>
+							<p class="module-subtitle">{mod.subtitle}</p>
+							<p class="module-description">{mod.description}</p>
+						</div>
 
-			<article class="panel">
-				<div class="panel-head">
-					<h2>Today&apos;s Sprint</h2>
-					<p>Recommended next session</p>
-				</div>
-				<ul class="task-list">
-					<li>
-						<span>1</span>
-						<div>
-							<p>Reading: matching headlines</p>
-							<small>8 minutes</small>
+						<div class="module-meta">
+							<span class="meta-item">
+								<span class="meta-icon">📋</span>
+								{mod.tasks}
+							</span>
+							<span class="meta-item">
+								<span class="meta-icon">⏱️</span>
+								{mod.duration}
+							</span>
 						</div>
-					</li>
-					<li>
-						<span>2</span>
-						<div>
-							<p>Listening: railway announcement</p>
-							<small>6 minutes</small>
-						</div>
-					</li>
-					<li>
-						<span>3</span>
-						<div>
-							<p>Speaking: self-introduction prompt</p>
-							<small>4 minutes</small>
-						</div>
-					</li>
-				</ul>
-			</article>
 
-			<article class="panel">
-				<div class="panel-head">
-					<h2>Mock Exam Radar</h2>
-					<p>Last simulation summary</p>
-				</div>
-				<div class="score-grid">
-					<div>
-						<p>Reading</p>
-						<strong>71%</strong>
-					</div>
-					<div>
-						<p>Writing</p>
-						<strong>64%</strong>
-					</div>
-					<div>
-						<p>Listening</p>
-						<strong>68%</strong>
-					</div>
-					<div>
-						<p>Speaking</p>
-						<strong>59%</strong>
-					</div>
-				</div>
-				<p class="footnote">Trend: focus speaking fluency to move from A2+ to solid B1.</p>
-			</article>
+						<div class="module-skills">
+							{#each mod.skills as skill}
+								<span class="skill-tag">{skill}</span>
+							{/each}
+						</div>
+
+						<div class="module-cta">
+							<span>Start Practice</span>
+							<span class="cta-arrow">→</span>
+						</div>
+					</a>
+				{/each}
+			</div>
 		</section>
+
+		<!-- Mock Exam CTA -->
+		<section class="mock-exam-section">
+			<div class="mock-exam-card">
+				<div class="mock-exam-content">
+					<span class="mock-exam-badge">Full Simulation</span>
+					<h2>Ready for a Mock Exam?</h2>
+					<p>Take a complete Goethe B1 simulation with all four modules under real exam conditions.</p>
+					<div class="mock-exam-info">
+						<span>⏱️ ~3.5 hours</span>
+						<span>📝 All 4 modules</span>
+						<span>🎯 CEFR assessment</span>
+					</div>
+				</div>
+				<a href="/mock-exam" class="btn btn-primary btn-lg">Start Mock Exam</a>
+			</div>
+		</section>
+
 	</div>
 {/if}
 
 <style>
-	.app-shell {
-		--bg: #f4f0e9;
-		--ink: #1f1d1a;
-		--panel: #fffdf8;
-		--line: #d8d0c4;
-		--accent: #cb5f2f;
-		--accent-2: #008064;
-		--accent-3: #1f5ab8;
-		--accent-4: #8a3ab4;
-		--title-font: "Avenir Next Condensed", "Franklin Gothic Medium", "Trebuchet MS", sans-serif;
-		--body-font: "IBM Plex Sans", "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
-		background:
-			radial-gradient(circle at 10% 10%, #ffe9d9 0%, transparent 30%),
-			radial-gradient(circle at 90% 15%, #d8f4ef 0%, transparent 35%),
-			var(--bg);
-		color: var(--ink);
+	/* === Landing Page === */
+	.landing {
 		min-height: 100vh;
-		padding: clamp(1rem, 2vw, 2.25rem);
-		font-family: var(--body-font);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		overflow: hidden;
+		padding: var(--space-xl);
 	}
 
-	.hero {
-		background: linear-gradient(130deg, #fffdf8, #f8f1e7);
-		border: 1px solid var(--line);
-		border-radius: 1.5rem;
-		padding: clamp(1.2rem, 3vw, 2rem);
-		box-shadow: 0 24px 50px -38px rgba(27, 22, 14, 0.7);
-		animation: rise 360ms ease-out both;
+	.landing-bg {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
 	}
 
-	.eyebrow {
+	.orb {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		opacity: 0.5;
+		animation: float 8s ease-in-out infinite;
+	}
+
+	.orb-1 {
+		width: 400px;
+		height: 400px;
+		background: var(--reading-primary);
+		top: -100px;
+		left: -100px;
+		animation-delay: 0s;
+	}
+
+	.orb-2 {
+		width: 350px;
+		height: 350px;
+		background: var(--listening-primary);
+		top: 20%;
+		right: -80px;
+		animation-delay: 2s;
+	}
+
+	.orb-3 {
+		width: 300px;
+		height: 300px;
+		background: var(--writing-primary);
+		bottom: 10%;
+		left: 20%;
+		animation-delay: 4s;
+	}
+
+	.orb-4 {
+		width: 250px;
+		height: 250px;
+		background: var(--speaking-primary);
+		bottom: -50px;
+		right: 20%;
+		animation-delay: 6s;
+	}
+
+	.landing-content {
+		text-align: center;
+		position: relative;
+		z-index: 1;
+		max-width: 700px;
+	}
+
+	.landing-eyebrow {
+		font-size: 0.875rem;
+		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.09em;
-		font-size: 0.8rem;
-		color: #6f6559;
+		letter-spacing: 0.15em;
+		color: var(--text-muted);
+		margin-bottom: var(--space-md);
+		animation: slideDown 0.6s ease forwards;
+	}
+
+	.landing-title {
+		font-size: clamp(2.5rem, 8vw, 5rem);
+		font-weight: 800;
+		line-height: 1.1;
+		margin-bottom: var(--space-lg);
+		animation: slideUp 0.6s ease forwards;
+		animation-delay: 0.1s;
+		opacity: 0;
+	}
+
+	.gradient-text {
+		background: linear-gradient(135deg, var(--reading-primary), var(--listening-primary), var(--writing-primary), var(--speaking-primary));
+		background-size: 300% 300%;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: shimmer 6s ease infinite;
+	}
+
+	.landing-subtitle {
+		font-size: 1.125rem;
+		color: var(--text-secondary);
+		max-width: 500px;
+		margin: 0 auto var(--space-xl);
+		animation: slideUp 0.6s ease forwards;
+		animation-delay: 0.2s;
+		opacity: 0;
+	}
+
+	.landing-actions {
+		display: flex;
+		gap: var(--space-md);
+		justify-content: center;
+		flex-wrap: wrap;
+		animation: slideUp 0.6s ease forwards;
+		animation-delay: 0.3s;
+		opacity: 0;
+	}
+
+	.landing-modules {
+		display: flex;
+		gap: var(--space-sm);
+		justify-content: center;
+		flex-wrap: wrap;
+		margin-top: var(--space-3xl);
+	}
+
+	.landing-module-pill {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		padding: var(--space-sm) var(--space-md);
+		background: var(--bg-card);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-full);
+		font-size: 0.875rem;
+		font-weight: 500;
+		animation: slideUp 0.6s ease forwards;
+		opacity: 0;
+	}
+
+	.landing-module-pill.reading { border-color: var(--reading-glow); }
+	.landing-module-pill.listening { border-color: var(--listening-glow); }
+	.landing-module-pill.writing { border-color: var(--writing-glow); }
+	.landing-module-pill.speaking { border-color: var(--speaking-glow); }
+
+	/* === App Container === */
+	.app-container {
+		min-height: 100vh;
+		padding: var(--space-lg);
+		max-width: 1400px;
+		margin: 0 auto;
+	}
+
+	/* === Navigation === */
+	.nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-lg);
+		padding: var(--space-md) var(--space-lg);
+		background: var(--bg-card);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-xl);
+		margin-bottom: var(--space-xl);
+		animation: slideDown 0.5s ease forwards;
+	}
+
+	.nav-brand {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+	}
+
+	.nav-logo {
+		font-size: 1.5rem;
+	}
+
+	.nav-title {
+		font-family: var(--font-heading);
+		font-weight: 700;
+		font-size: 1.125rem;
+	}
+
+	.nav-links {
+		display: flex;
+		gap: var(--space-xs);
+	}
+
+	.nav-link {
+		padding: var(--space-sm) var(--space-md);
+		border-radius: var(--radius-md);
+		font-weight: 500;
+		color: var(--text-secondary);
+		transition: all var(--transition-fast);
+	}
+
+	.nav-link:hover {
+		color: var(--text-primary);
+		background: var(--bg-elevated);
+	}
+
+	.nav-link.active {
+		color: var(--text-primary);
+		background: var(--bg-elevated);
+	}
+
+	.nav-user {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+	}
+
+	.nav-user-name {
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	/* === Modules Section === */
+	.modules-section {
+		animation: slideUp 0.6s ease forwards;
+		opacity: 0;
+		animation-fill-mode: forwards;
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: var(--space-xl);
+	}
+
+	.section-header h2 {
 		margin: 0;
 	}
 
-	h1,
-	h2 {
-		font-family: var(--title-font);
-		letter-spacing: 0.01em;
+	.section-header p {
+		margin: var(--space-xs) 0 0;
 	}
 
-	.hero h1 {
-		margin: 0.35rem 0;
-		font-size: clamp(1.7rem, 4vw, 2.9rem);
+	.modules-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: var(--space-lg);
 	}
 
-	.hero p {
-		margin: 0;
-		max-width: 62ch;
+	.module-card {
+		display: flex;
+		flex-direction: column;
+		padding: var(--space-xl);
+		background: var(--bg-card);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-xl);
+		transition: all var(--transition-normal);
+		animation: slideUp 0.5s ease forwards;
+		opacity: 0;
+		cursor: pointer;
+		text-decoration: none;
+	}
+
+	.module-card:hover {
+		background: var(--bg-card-hover);
+		border-color: var(--border-default);
+		transform: translateY(-8px);
+	}
+
+	.module-card.reading:hover { box-shadow: var(--shadow-glow) var(--reading-glow); }
+	.module-card.listening:hover { box-shadow: var(--shadow-glow) var(--listening-glow); }
+	.module-card.writing:hover { box-shadow: var(--shadow-glow) var(--writing-glow); }
+	.module-card.speaking:hover { box-shadow: var(--shadow-glow) var(--speaking-glow); }
+
+	.module-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: var(--space-lg);
+	}
+
+	.module-icon {
+		font-size: 2.5rem;
+	}
+
+	.module-progress-ring {
+		position: relative;
+		width: 48px;
+		height: 48px;
+	}
+
+	.module-progress-ring svg {
+		width: 100%;
+		height: 100%;
+		transform: rotate(-90deg);
+	}
+
+	.ring-bg {
+		fill: none;
+		stroke: var(--bg-elevated);
+		stroke-width: 3;
+	}
+
+	.ring-fill {
+		fill: none;
+		stroke-width: 3;
+		stroke-linecap: round;
+		transition: stroke-dasharray 1s ease;
+	}
+
+	.reading .ring-fill { stroke: var(--reading-primary); }
+	.listening .ring-fill { stroke: var(--listening-primary); }
+	.writing .ring-fill { stroke: var(--writing-primary); }
+	.speaking .ring-fill { stroke: var(--speaking-primary); }
+
+	.ring-value {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.625rem;
+		font-weight: 700;
+		color: var(--text-secondary);
+	}
+
+	.module-body {
+		flex: 1;
+	}
+
+	.module-name {
+		font-size: 1.5rem;
+		margin-bottom: 0;
+	}
+
+	.reading .module-name { color: var(--reading-primary); }
+	.listening .module-name { color: var(--listening-primary); }
+	.writing .module-name { color: var(--writing-primary); }
+	.speaking .module-name { color: var(--speaking-primary); }
+
+	.module-subtitle {
+		font-size: 0.875rem;
+		color: var(--text-muted);
+		margin: var(--space-xs) 0 var(--space-md);
+	}
+
+	.module-description {
+		font-size: 0.875rem;
+		color: var(--text-secondary);
 		line-height: 1.5;
 	}
 
-	.hero-actions {
+	.module-meta {
+		display: flex;
+		gap: var(--space-lg);
+		margin-top: var(--space-lg);
+		padding-top: var(--space-md);
+		border-top: 1px solid var(--border-subtle);
+	}
+
+	.meta-item {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		font-size: 0.875rem;
+		color: var(--text-muted);
+	}
+
+	.module-skills {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.7rem;
-		margin-top: 1.1rem;
+		gap: var(--space-xs);
+		margin-top: var(--space-md);
 	}
 
-	.btn {
-		font: inherit;
-		font-weight: 600;
-		padding: 0.62rem 1rem;
-		border-radius: 999px;
-		border: 1px solid transparent;
-		text-decoration: none;
-		cursor: pointer;
+	.skill-tag {
+		font-size: 0.75rem;
+		padding: var(--space-xs) var(--space-sm);
+		background: var(--bg-elevated);
+		border-radius: var(--radius-full);
+		color: var(--text-muted);
 	}
 
-	.btn-primary {
-		background: var(--ink);
-		color: #fff;
-	}
-
-	.btn-subtle {
-		background: #fff;
-		border-color: var(--line);
-		color: var(--ink);
-	}
-
-	.meter-wrap {
-		margin-top: 1.1rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--line);
-	}
-
-	.meter-title {
-		font-size: 0.9rem;
-		color: #5e574e;
-	}
-
-	.meter-bar {
-		background: #e9e1d5;
-		height: 0.7rem;
-		border-radius: 999px;
-		overflow: hidden;
-		margin: 0.4rem 0 0.3rem;
-	}
-
-	.meter-indicator {
-		display: block;
-		height: 100%;
-		background: linear-gradient(90deg, #e68051, #cb5f2f);
-		border-radius: 999px;
-	}
-
-	.meter-caption {
-		font-size: 0.9rem;
-		color: #5e574e;
-	}
-
-	.main-grid {
-		display: grid;
-		grid-template-columns: repeat(12, minmax(0, 1fr));
-		gap: 1rem;
-		margin-top: 0.9rem;
-	}
-
-	.section-rule {
-		margin: 1rem 0 0.5rem;
-		height: 1px;
-		background: var(--line);
-	}
-
-	.panel {
-		background: var(--panel);
-		border: 1px solid var(--line);
-		border-radius: 1.25rem;
-		padding: 1rem;
-		box-shadow: 0 14px 32px -30px rgba(26, 21, 14, 0.65);
-		animation: rise 500ms ease-out both;
-	}
-
-	.panel-large {
-		grid-column: span 12;
-		animation-delay: 90ms;
-	}
-
-	.main-grid .panel:nth-child(2) {
-		grid-column: span 7;
-		animation-delay: 150ms;
-	}
-
-	.main-grid .panel:nth-child(3) {
-		grid-column: span 5;
-		animation-delay: 210ms;
-	}
-
-	.panel-head h2 {
-		margin: 0;
-		font-size: 1.32rem;
-	}
-
-	.panel-head p {
-		margin: 0.28rem 0 0;
-		color: #685f53;
-	}
-
-	.skill-tabs {
-		margin-top: 0.95rem;
-	}
-
-	.tabs-list {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 0.5rem;
-		background: #f3ebde;
-		padding: 0.4rem;
-		border-radius: 0.9rem;
-		border: 1px solid #e4d9ca;
-	}
-
-	.tabs-trigger {
-		background: transparent;
-		border: 0;
-		border-radius: 0.7rem;
-		font: inherit;
-		font-weight: 650;
-		padding: 0.55rem 0.4rem;
-		cursor: pointer;
-		color: #5f5548;
-		transition:
-			background 180ms ease,
-			color 180ms ease,
-			transform 180ms ease;
-	}
-
-	:global(.tabs-trigger[data-state="active"]) {
-		background: #fff;
-		color: #1f1a14;
-		transform: translateY(-1px);
-		box-shadow: 0 10px 18px -15px rgba(24, 18, 10, 0.55);
-	}
-
-	.tabs-content {
-		margin-top: 0.75rem;
-	}
-
-	.skill-card {
-		border-radius: 1rem;
-		padding: 1rem;
-		background: #fff;
-		border: 1px solid #e8ded1;
-		display: grid;
-		gap: 0.6rem;
-	}
-
-	.track-focus {
-		margin: 0;
-		color: #5b5145;
-	}
-
-	.track-meta {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-	}
-
-	.track-meta span {
-		color: #6e6559;
-	}
-
-	.track-meta strong {
-		font-size: 1.35rem;
-	}
-
-	.skill-card button {
-		border: 0;
-		background: #191613;
-		color: #fff;
-		padding: 0.45rem 0.65rem;
-		border-radius: 0.7rem;
-		font: inherit;
-		font-size: 0.87rem;
-		cursor: pointer;
-		width: fit-content;
-	}
-
-	.track-name {
-		font-weight: 700;
-		margin: 0;
-	}
-
-	.track-level,
-	.track-target {
-		margin: 0.25rem 0;
-		color: #594f45;
-	}
-
-	.reading {
-		box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--accent) 30%, white);
-	}
-
-	.writing {
-		box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--accent-2) 34%, white);
-	}
-
-	.listening {
-		box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--accent-3) 32%, white);
-	}
-
-	.speaking {
-		box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--accent-4) 36%, white);
-	}
-
-	.task-list {
-		list-style: none;
-		padding: 0;
-		margin: 0.9rem 0 0;
-		display: grid;
-		gap: 0.6rem;
-	}
-
-	.task-list li {
+	.module-cta {
 		display: flex;
 		align-items: center;
-		gap: 0.7rem;
-		padding: 0.55rem;
-		background: #fff;
-		border: 1px solid #ece4d8;
-		border-radius: 0.85rem;
-	}
-
-	.task-list span {
-		width: 1.65rem;
-		height: 1.65rem;
-		border-radius: 50%;
-		display: grid;
-		place-items: center;
-		background: #f3ebde;
-		font-weight: 700;
-	}
-
-	.task-list p {
-		margin: 0;
+		justify-content: space-between;
+		margin-top: var(--space-lg);
+		padding: var(--space-md);
+		background: var(--bg-elevated);
+		border-radius: var(--radius-md);
 		font-weight: 600;
+		color: var(--text-primary);
+		transition: all var(--transition-fast);
 	}
 
-	.task-list small {
-		color: #716758;
+	.module-card:hover .module-cta {
+		background: var(--bg-primary);
 	}
 
-	.score-grid {
-		margin-top: 0.9rem;
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.55rem;
+	.cta-arrow {
+		transition: transform var(--transition-fast);
 	}
 
-	.score-grid div {
-		border: 1px solid #ece4d8;
-		border-radius: 0.8rem;
-		padding: 0.6rem;
-		background: #fff;
+	.module-card:hover .cta-arrow {
+		transform: translateX(4px);
 	}
 
-	.score-grid p {
-		margin: 0;
-		color: #6f6658;
-		font-size: 0.88rem;
+	/* === Mock Exam Section === */
+	.mock-exam-section {
+		margin-top: var(--space-2xl);
+		animation: slideUp 0.6s ease forwards;
+		animation-delay: 0.2s;
+		opacity: 0;
+		animation-fill-mode: forwards;
 	}
 
-	.score-grid strong {
-		font-size: 1.35rem;
+	.mock-exam-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-xl);
+		padding: var(--space-2xl);
+		background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-xl);
+		position: relative;
+		overflow: hidden;
 	}
 
-	.footnote {
-		margin: 0.8rem 0 0;
-		font-size: 0.93rem;
-		color: #5f5547;
+	.mock-exam-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 40%;
+		height: 100%;
+		background: radial-gradient(ellipse at right, var(--writing-glow) 0%, transparent 70%);
+		opacity: 0.3;
 	}
 
-	@keyframes rise {
-		from {
-			transform: translateY(10px);
-			opacity: 0;
+	.mock-exam-content {
+		position: relative;
+		z-index: 1;
+	}
+
+	.mock-exam-badge {
+		display: inline-block;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		padding: var(--space-xs) var(--space-sm);
+		background: var(--writing-primary);
+		color: white;
+		border-radius: var(--radius-sm);
+		margin-bottom: var(--space-md);
+	}
+
+	.mock-exam-content h2 {
+		margin-bottom: var(--space-sm);
+	}
+
+	.mock-exam-content p {
+		max-width: 400px;
+	}
+
+	.mock-exam-info {
+		display: flex;
+		gap: var(--space-lg);
+		margin-top: var(--space-md);
+		font-size: 0.875rem;
+		color: var(--text-muted);
+	}
+
+	/* === Responsive === */
+	@media (max-width: 768px) {
+		.nav {
+			flex-direction: column;
+			gap: var(--space-md);
 		}
-		to {
-			transform: translateY(0);
-			opacity: 1;
-		}
-	}
 
-	@media (max-width: 860px) {
-		.tabs-list {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+		.nav-links {
+			order: 3;
+			width: 100%;
+			justify-content: center;
 		}
 
-		.main-grid .panel:nth-child(2),
-		.main-grid .panel:nth-child(3) {
-			grid-column: span 12;
+		.mock-exam-card {
+			flex-direction: column;
+			text-align: center;
+		}
+
+		.mock-exam-info {
+			justify-content: center;
+			flex-wrap: wrap;
+		}
+
+		.section-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: var(--space-md);
 		}
 	}
 </style>
