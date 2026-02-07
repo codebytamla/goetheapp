@@ -25,8 +25,8 @@
 	</div>
 	<div class="nav-links">
 		<a href="/" class:active={page.url.pathname === "/"} class="nav-link">Dashboard</a>
-		<a href="/progress" class:active={page.url.pathname === "/progress"} class="nav-link">Progress</a>
 		<a href="/history" class:active={page.url.pathname === "/history"} class="nav-link">History</a>
+		<a href="/progress" class:active={page.url.pathname === "/progress"} class="nav-link">Progress</a>
 	</div>
 	<div class="nav-user">
 		<div class="user-streak">

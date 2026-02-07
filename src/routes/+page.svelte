@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowRight, BookOpen, Clock3, Headphones, Mic, PenTool } from "@lucide/svelte";
+	import { AlarmClock, ArrowRight, BookOpen, Clock3, Headphones, Mic, PenTool } from "@lucide/svelte";
 	import AppNav from "$lib/components/AppNav.svelte";
 	import type { PageData } from "./$types";
 
@@ -126,14 +126,14 @@
 			<section class="mock-exam-banner">
 				<div class="mock-exam-info">
 					<div class="mock-icon">
-						<Clock3 size={24} />
+						<AlarmClock size={24} />
 					</div>
 					<div class="mock-text">
 						<h3>Full Mock Exam</h3>
 						<p>Simulate the real test conditions (approx. 3.5h)</p>
 					</div>
 				</div>
-				<a href="/mock-exam" class="btn btn-secondary btn-sm">Start Simulation</a>
+				<a href="/mock-exam" class="btn btn-secondary btn-sm start-sim-btn">Start Simulation</a>
 			</section>
 
 			<!-- Modules Grid -->
@@ -142,23 +142,16 @@
 					{@const Icon = moduleIcons[mod.id]}
 					<div class="module-widget">
 						<div class="widget-header">
-							<div class="widget-icon {mod.accent}">
-								<Icon size={24} />
+							<div class="widget-header-main">
+								<div class="widget-icon {mod.accent}">
+									<Icon size={24} />
+								</div>
+								<div class="widget-title">
+									<h3>{mod.name}</h3>
+									<span class="widget-subtitle">{mod.subtitle}</span>
+								</div>
 							</div>
-							<div class="widget-title">
-								<h3>{mod.name}</h3>
-								<span class="widget-subtitle">{mod.subtitle}</span>
-							</div>
-							<!-- <div class="widget-meta">
-								<span>{mod.completed}/{mod.total}</span>
-							</div> -->
 						</div>
-						
-						<!-- <div class="widget-progress">
-							<div class="progress-bar">
-								<div class="progress-fill {mod.accent}" style="width: {mod.progress}%"></div>
-							</div>
-						</div> -->
 
 						<div class="widget-footer">
 							<span class="last-session">
@@ -388,6 +381,7 @@
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-lg);
 		padding: var(--space-md) var(--space-lg);
+		min-height: 80px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -398,12 +392,12 @@
 	.mock-exam-info {
 		display: flex;
 		align-items: center;
-		gap: var(--space-lg);
+		gap: var(--space-md);
 	}
 
 	.mock-icon {
-		width: 48px;
-		height: 48px;
+		width: 44px;
+		height: 44px;
 		background: #f8fafc;
 		border-radius: var(--radius-md);
 		display: flex;
@@ -413,13 +407,28 @@
 	}
 
 	.mock-text h3 {
-		font-size: 1rem;
-		margin-bottom: 0.1rem;
+		font-family: var(--font-body);
+		font-size: 1.05rem;
+		font-weight: 700;
+		letter-spacing: 0;
+		line-height: 1.2;
+		margin-bottom: 0.15rem;
 	}
 
 	.mock-text p {
 		font-size: 0.875rem;
 		margin: 0;
+	}
+
+	.start-sim-btn {
+		background: #1f2937;
+		color: #ffffff;
+		border-color: #1f2937;
+	}
+
+	.start-sim-btn:hover {
+		background: #111827;
+		border-color: #111827;
 	}
 
 	/* Modules Grid */
@@ -438,6 +447,8 @@
 		transition: all 0.2s ease;
 		display: flex;
 		flex-direction: column;
+		gap: var(--space-sm);
+		min-height: 160px;
 	}
 
 	.module-widget:hover {
@@ -448,9 +459,16 @@
 
 	.widget-header {
 		display: flex;
-		align-items: flex-start;
+		align-items: center;
+		justify-content: space-between;
 		gap: var(--space-md);
-		margin-bottom: var(--space-md);
+	}
+
+	.widget-header-main {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+		min-width: 0;
 	}
 
 	.widget-icon {
@@ -462,13 +480,14 @@
 		justify-content: center;
 	}
 
-	.widget-icon.reading { background: var(--reading-glow); color: var(--reading-primary); }
-	.widget-icon.listening { background: var(--listening-glow); color: var(--listening-primary); }
-	.widget-icon.writing { background: var(--writing-glow); color: var(--writing-primary); }
-	.widget-icon.speaking { background: var(--speaking-glow); color: var(--speaking-primary); }
+	.widget-icon.reading { background: color-mix(in srgb, var(--reading-glow) 88%, white); color: var(--reading-primary); }
+	.widget-icon.listening { background: color-mix(in srgb, var(--listening-glow) 88%, white); color: var(--listening-primary); }
+	.widget-icon.writing { background: color-mix(in srgb, var(--writing-glow) 88%, white); color: var(--writing-primary); }
+	.widget-icon.speaking { background: color-mix(in srgb, var(--speaking-glow) 88%, white); color: var(--speaking-primary); }
 
 	.widget-title {
 		flex: 1;
+		min-width: 0;
 	}
 
 	.widget-title h3 {
@@ -481,36 +500,6 @@
 		color: var(--text-muted);
 	}
 
-	.widget-meta {
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		background: var(--bg-primary);
-		padding: 2px 8px;
-		border-radius: var(--radius-full);
-	}
-
-	.widget-progress {
-		margin-bottom: var(--space-lg);
-	}
-
-	.progress-bar {
-		height: 6px;
-		background: var(--bg-elevated);
-		border-radius: var(--radius-full);
-		overflow: hidden;
-	}
-
-	.progress-fill {
-		height: 100%;
-		border-radius: var(--radius-full);
-	}
-
-	.progress-fill.reading { background: var(--reading-primary); }
-	.progress-fill.listening { background: var(--listening-primary); }
-	.progress-fill.writing { background: var(--writing-primary); }
-	.progress-fill.speaking { background: var(--speaking-primary); }
-
 	.widget-footer {
 		margin-top: auto;
 		display: flex;
@@ -518,6 +507,7 @@
 		justify-content: space-between;
 		padding-top: var(--space-md);
 		border-top: 1px solid var(--border-subtle);
+		gap: var(--space-sm);
 	}
 
 	.last-session {
@@ -544,6 +534,12 @@
 		.header-stats {
 			width: 100%;
 			justify-content: flex-start;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.widget-footer {
+			flex-wrap: wrap;
 		}
 	}
 </style>
