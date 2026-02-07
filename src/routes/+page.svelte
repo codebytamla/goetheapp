@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool } from "@lucide/svelte";
+	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool, Target } from "@lucide/svelte";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
@@ -107,18 +107,36 @@
 			</div>
 		</nav>
 
+		<!-- Mock Exam CTA -->
+		<section class="mock-exam-section">
+			<div class="mock-exam-card">
+				<div class="mock-exam-content">
+					<span class="mock-exam-badge">Full Simulation</span>
+					<h2>Ready for a Mock Exam?</h2>
+					<p>Take a complete Goethe B1 simulation with all four modules under real exam conditions.</p>
+					<div class="mock-exam-info">
+						<span><Clock3 size={14} aria-hidden="true" /> ~3.5 hours</span>
+						<span><ListChecks size={14} aria-hidden="true" /> All 4 modules</span>
+						<span><Target size={14} aria-hidden="true" /> CEFR assessment</span>
+					</div>
+				</div>
+				<a href="/mock-exam" class="btn btn-primary btn-lg">Start Mock Exam</a>
+			</div>
+		</section>
+
 		<!-- Modules Section -->
 		<section class="modules-section">
 			<div class="section-header">
-				<h2>Prüfungsmodule</h2>
-				<p>Choose a module to practice or take a full mock exam</p>
+			<!-- <span class="mock-exam-badge">Modules</span> -->
+				<!-- <h2>Modules</h2> -->
+				<!-- <p>Choose a module to practice or take a full mock exam</p> -->
 			</div>
 
 			<div class="modules-grid">
 				{#each modules as mod, i}
 					{@const Icon = moduleIcons[mod.id]}
-					<a 
-						href="/{mod.id}" 
+					<a
+						href="/{mod.id}"
 						class="module-card {mod.accent}"
 						style="animation-delay: {i * 80}ms"
 					>
@@ -127,7 +145,7 @@
 								<Icon size={30} aria-hidden="true" />
 							</span>
 						</div>
-						
+
 						<div class="module-body">
 							<h3 class="module-name">{mod.name}</h3>
 							<p class="module-subtitle">{mod.subtitle}</p>
@@ -159,23 +177,6 @@
 						</div>
 					</a>
 				{/each}
-			</div>
-		</section>
-
-		<!-- Mock Exam CTA -->
-		<section class="mock-exam-section">
-			<div class="mock-exam-card">
-				<div class="mock-exam-content">
-					<span class="mock-exam-badge">Full Simulation</span>
-					<h2>Ready for a Mock Exam?</h2>
-					<p>Take a complete Goethe B1 simulation with all four modules under real exam conditions.</p>
-					<div class="mock-exam-info">
-						<span>⏱️ ~3.5 hours</span>
-						<span>📝 All 4 modules</span>
-						<span>🎯 CEFR assessment</span>
-					</div>
-				</div>
-				<a href="/mock-exam" class="btn btn-primary btn-lg">Start Mock Exam</a>
 			</div>
 		</section>
 
@@ -559,7 +560,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--space-xl);
-		padding: var(--space-2xl);
+		padding: var(--space-lg) var(--space-2xl);
 		background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-xl);
@@ -610,6 +611,12 @@
 		margin-top: var(--space-md);
 		font-size: 0.875rem;
 		color: var(--text-muted);
+	}
+
+	.mock-exam-info span {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
 	}
 
 	/* === Responsive === */
