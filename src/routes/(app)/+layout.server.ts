@@ -2,9 +2,9 @@ import { redirect } from "@sveltejs/kit";
 
 import { createAuth, type AuthEnv } from "$lib/server/auth";
 
-import type { PageServerLoad } from "./$types";
+import type { LayoutServerLoad } from "./$types";
 
-export const load: PageServerLoad = async (event) => {
+export const load: LayoutServerLoad = async (event) => {
 	if (!event.platform?.env) {
 		throw redirect(303, "/auth");
 	}

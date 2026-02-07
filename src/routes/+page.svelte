@@ -1,17 +1,28 @@
 <script lang="ts">
-	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool, Target, TrendingUp, Calendar, ArrowRight, CheckCircle2 } from "@lucide/svelte";
+	import { ArrowRight, BookOpen, Clock3, Headphones, Mic, PenTool } from "@lucide/svelte";
+	import AppNav from "$lib/components/AppNav.svelte";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
+	type ModuleId = "lesen" | "hoeren" | "schreiben" | "sprechen";
 
-	const moduleIcons = {
+	const moduleIcons: Record<ModuleId, typeof BookOpen> = {
 		lesen: BookOpen,
 		hoeren: Headphones,
 		schreiben: PenTool,
 		sprechen: Mic
 	};
 
-	const modules = [
+	const modules: Array<{
+		id: ModuleId;
+		name: string;
+		subtitle: string;
+		progress: number;
+		total: number;
+		completed: number;
+		lastSession: string;
+		accent: "reading" | "listening" | "writing" | "speaking";
+	}> = [
 		{
 			id: "lesen",
 			name: "Lesen",
@@ -90,32 +101,7 @@
 	</div>
 {:else}
 	<div class="app-shell">
-		<!-- Navigation -->
-		<nav class="app-nav">
-			<div class="nav-brand">
-				<div class="nav-logo-circle">
-					<Languages size={20} aria-hidden="true" />
-				</div>
-				<span class="nav-title">Goethe Trainer</span>
-			</div>
-			<div class="nav-links">
-				<a href="/" class="nav-link active">Dashboard</a>
-				<a href="/progress" class="nav-link">Progress</a>
-				<a href="/mock-exam" class="nav-link">Mock Exam</a>
-			</div>
-			<div class="nav-user">
-				<div class="user-streak">
-					<TrendingUp size={16} style="color: #16a34a;" />
-					<span>3 Day Streak</span>
-				</div>
-				<div class="nav-divider"></div>
-				<a href="/auth" class="user-profile">
-					<div class="avatar">
-						{data.user?.name?.[0] || "L"}
-					</div>
-				</a>
-			</div>
-		</nav>
+		<AppNav user={data.user} />
 
 		<main class="dashboard-content">
 			<!-- Dashboard Header -->
@@ -349,99 +335,6 @@
 		padding-bottom: var(--space-2xl);
 	}
 
-	.app-nav {
-		position: sticky;
-		top: 0;
-		z-index: 50;
-		background: rgba(255, 255, 255, 0.9);
-		backdrop-filter: blur(10px);
-		border-bottom: 1px solid var(--border-subtle);
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0.75rem var(--space-lg);
-		margin-bottom: var(--space-lg);
-	}
-
-	.nav-brand {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.nav-logo-circle {
-		width: 36px;
-		height: 36px;
-		background: var(--bg-elevated);
-		border-radius: var(--radius-md);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--text-primary);
-	}
-
-	.nav-title {
-		font-weight: 700;
-		font-size: 1.1rem;
-		letter-spacing: -0.01em;
-	}
-
-	.nav-links {
-		display: flex;
-		gap: 0.25rem;
-	}
-
-	.nav-link {
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: var(--text-secondary);
-		padding: 0.5rem 1rem;
-		border-radius: var(--radius-sm);
-		transition: all 0.2s;
-	}
-
-	.nav-link:hover, .nav-link.active {
-		color: var(--text-primary);
-		background: var(--bg-elevated);
-	}
-
-	.nav-user {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.user-streak {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		background: var(--bg-elevated);
-		padding: 0.25rem 0.75rem;
-		border-radius: var(--radius-full);
-	}
-
-	.nav-divider {
-		width: 1px;
-    height: 24px;
-    background: var(--border-default);
-	}
-
-	.avatar {
-		width: 36px;
-		height: 36px;
-		background: #2563eb;
-		color: white;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 600;
-		font-size: 0.9rem;
-	}
-
 	.dashboard-content {
 		max-width: 1200px;
 		margin: 0 auto;
@@ -642,11 +535,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.app-nav {
-			flex-direction: column;
-			gap: 1rem;
-		}
-		
 		.dashboard-header {
 			flex-direction: column;
 			align-items: flex-start;

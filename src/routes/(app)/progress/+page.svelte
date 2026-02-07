@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { Progress, Separator } from "bits-ui";
-	import type { PageData } from "./$types";
-
-	let { data }: { data: PageData } = $props();
 
 	const readiness = 62;
 
@@ -21,22 +18,6 @@
 </script>
 
 <div class="app-container">
-	<nav class="nav">
-		<div class="nav-brand">
-			<span class="nav-logo">DE</span>
-			<span class="nav-title">Goethe Trainer</span>
-		</div>
-		<div class="nav-links">
-			<a href="/" class="nav-link">Dashboard</a>
-			<a href="/progress" class="nav-link active">Progress</a>
-			<a href="/mock-exam" class="nav-link">Mock Exam</a>
-		</div>
-		<div class="nav-user">
-			<span class="nav-user-name">{data.user?.name ?? data.user?.email?.split("@")[0] ?? "Learner"}</span>
-			<a href="/auth" class="btn btn-ghost">Account</a>
-		</div>
-	</nav>
-
 	<header class="header">
 		<p class="eyebrow">Exam Readiness</p>
 		<h1>Progress Center</h1>
@@ -95,76 +76,7 @@
 
 <style>
 	.app-container {
-		min-height: 100vh;
-		padding: var(--space-lg);
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-lg);
-		padding: var(--space-md) var(--space-lg);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
-		margin-bottom: var(--space-xl);
-	}
-
-	.nav-brand {
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-	}
-
-	.nav-logo {
-		font-size: 0.82rem;
-		padding: 0.2rem 0.4rem;
-		background: var(--bg-elevated);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--border-subtle);
-	}
-
-	.nav-title {
-		font-family: var(--font-heading);
-		font-weight: 700;
-		font-size: 1.125rem;
-	}
-
-	.nav-links {
-		display: flex;
-		gap: var(--space-xs);
-	}
-
-	.nav-link {
-		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
-		font-weight: 500;
-		color: var(--text-secondary);
-		transition: all var(--transition-fast);
-	}
-
-	.nav-link:hover {
-		color: var(--text-primary);
-		background: var(--bg-elevated);
-	}
-
-	.nav-link.active {
-		color: var(--text-primary);
-		background: var(--bg-elevated);
-	}
-
-	.nav-user {
-		display: flex;
-		align-items: center;
-		gap: var(--space-md);
-	}
-
-	.nav-user-name {
-		font-weight: 500;
-		color: var(--text-secondary);
+		padding-bottom: var(--space-lg);
 	}
 
 	.header h1 {
@@ -321,11 +233,6 @@
 	}
 
 	@media (max-width: 880px) {
-		.nav {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
 		.grid {
 			grid-template-columns: 1fr;
 		}
