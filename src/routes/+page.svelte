@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { AlarmClock, ArrowRight, BookOpen, Clock3, Headphones, Mic, PenTool } from "@lucide/svelte";
 	import AppNav from "$lib/components/AppNav.svelte";
-	import type { PageData } from "./$types";
+	import type { ActionData, PageData } from "./$types";
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData | null } = $props();
 	type ModuleId = "lesen" | "hoeren" | "schreiben" | "sprechen";
 
 	const moduleIcons: Record<ModuleId, typeof BookOpen> = {
@@ -65,6 +65,29 @@
 		}
 	];
 
+	let authModalOpen = $state(false);
+
+	$effect(() => {
+		if (form?.message) {
+			authModalOpen = true;
+		}
+	});
+
+	const openAuthModal = (event: MouseEvent) => {
+		event.preventDefault();
+		authModalOpen = true;
+	};
+
+	const closeAuthModal = () => {
+		authModalOpen = false;
+	};
+
+	const closeOnBackdropClick = (event: MouseEvent) => {
+		if (event.target === event.currentTarget) {
+			authModalOpen = false;
+		}
+	};
+
 </script>
 
 {#if !data.isAuthenticated}
@@ -85,7 +108,7 @@
 				Interactive practice for all four exam modules with AI-powered feedback and real exam simulations.
 			</p>
 			<div class="landing-actions">
-				<a class="btn btn-primary btn-lg" href="/auth">Get Started</a>
+				<a class="btn btn-primary btn-lg" href="/auth" onclick={openAuthModal}>Get Started</a>
 				<button class="btn btn-secondary btn-lg" type="button">Learn More</button>
 			</div>
 			<div class="landing-modules">
@@ -98,6 +121,66 @@
 				{/each}
 			</div>
 		</div>
+
+		{#if authModalOpen}
+			<div
+				class="auth-modal-backdrop"
+				role="presentation"
+				onclick={closeOnBackdropClick}
+			>
+				<div
+					class="auth-modal"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="auth-modal-title"
+				>
+					<button
+						type="button"
+						class="auth-modal-close"
+						aria-label="Close sign in modal"
+						onclick={closeAuthModal}
+					>
+						×
+					</button>
+					<p class="auth-modal-eyebrow">Sign In</p>
+					<h2 id="auth-modal-title">Continue your practice</h2>
+					<p class="auth-modal-subtitle">
+						{data.googleEnabled
+							? "Use Google or a magic link to sign in instantly."
+							: "Use a magic link to sign in instantly."}
+					</p>
+
+					{#if data.googleEnabled}
+						<form method="POST" action="/auth?/signInGoogle">
+							<button type="submit" class="btn btn-primary auth-modal-btn">
+								Continue with Google
+							</button>
+						</form>
+					{/if}
+
+					<form method="POST" action="?/requestMagicLink" class="auth-email-form">
+						<label for="landing-auth-email">Email</label>
+						<input
+							id="landing-auth-email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							value={form?.email ?? ""}
+							required
+						/>
+						<button type="submit" class="btn btn-secondary auth-modal-btn">
+							Send magic link
+						</button>
+					</form>
+
+					{#if form?.message}
+						<p class={form.status === "error" ? "auth-feedback auth-feedback-error" : "auth-feedback auth-feedback-success"}>
+							{form.message}
+						</p>
+					{/if}
+				</div>
+			</div>
+		{/if}
 	</div>
 {:else}
 	<div class="app-shell">
@@ -320,6 +403,110 @@
 	.landing-module-pill.listening { border-color: var(--listening-glow); }
 	.landing-module-pill.writing { border-color: var(--writing-glow); }
 	.landing-module-pill.speaking { border-color: var(--speaking-glow); }
+
+	.auth-modal-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 60;
+		background: rgba(15, 23, 42, 0.5);
+		backdrop-filter: blur(4px);
+		display: grid;
+		place-items: center;
+		padding: var(--space-lg);
+	}
+
+	.auth-modal {
+		position: relative;
+		width: min(460px, 100%);
+		background: var(--bg-card);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-xl);
+		padding: var(--space-xl);
+		box-shadow: var(--shadow-lg);
+		display: grid;
+		gap: var(--space-md);
+	}
+
+	.auth-modal-close {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		width: 2rem;
+		height: 2rem;
+		border: none;
+		background: transparent;
+		color: var(--text-muted);
+		font-size: 1.35rem;
+		cursor: pointer;
+		border-radius: var(--radius-full);
+	}
+
+	.auth-modal-close:hover {
+		background: var(--bg-elevated);
+		color: var(--text-primary);
+	}
+
+	.auth-modal-eyebrow {
+		font-size: 0.75rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.auth-modal h2 {
+		font-size: 1.45rem;
+	}
+
+	.auth-modal-subtitle {
+		font-size: 0.95rem;
+		color: var(--text-secondary);
+	}
+
+	.auth-modal-btn {
+		width: 100%;
+	}
+
+	.auth-email-form {
+		display: grid;
+		gap: 0.6rem;
+	}
+
+	.auth-email-form label {
+		font-size: 0.88rem;
+		color: var(--text-secondary);
+	}
+
+	.auth-email-form input {
+		width: 100%;
+		padding: 0.65rem 0.75rem;
+		border-radius: var(--radius-md);
+		border: 1px solid var(--border-default);
+		background: #fff;
+		color: var(--text-primary);
+	}
+
+	.auth-email-form input:focus {
+		outline: 2px solid rgba(37, 99, 235, 0.2);
+		border-color: #2563eb;
+	}
+
+	.auth-feedback {
+		font-size: 0.88rem;
+		border-radius: var(--radius-sm);
+		padding: 0.55rem 0.65rem;
+	}
+
+	.auth-feedback-success {
+		color: #166534;
+		background: #f0fdf4;
+		border: 1px solid #bbf7d0;
+	}
+
+	.auth-feedback-error {
+		color: #991b1b;
+		background: #fef2f2;
+		border: 1px solid #fecaca;
+	}
 
 	/* === App Shell (Dashboard) === */
 	.app-shell {

@@ -22,16 +22,12 @@
 		<button type="submit">Sign out</button>
 	</form>
 {:else}
-	<form method="POST" action="?/signInGoogle">
-		<button type="submit" disabled={!data.googleEnabled}>
-			Continue with Google
-		</button>
-	</form>
-
-	{#if !data.googleEnabled}
-		<p class="hint">
-			Set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> to enable Google sign-in.
-		</p>
+	{#if data.googleEnabled}
+		<form method="POST" action="?/signInGoogle">
+			<button type="submit">
+				Continue with Google
+			</button>
+		</form>
 	{/if}
 
 	<form method="POST" action="?/requestMagicLink">

@@ -72,7 +72,7 @@ export const actions: Actions = {
 				headers: event.request.headers,
 				body: {
 					email,
-					callbackURL: "/auth",
+					callbackURL: "/",
 					errorCallbackURL: "/auth"
 				}
 			});
@@ -102,7 +102,7 @@ export const actions: Actions = {
 		await auth.api.signOut({
 			headers: event.request.headers
 		});
-		throw redirect(303, "/auth");
+		throw redirect(303, "/");
 	},
 	signInGoogle: async (event) => {
 		if (!event.platform?.env) {
@@ -125,7 +125,7 @@ export const actions: Actions = {
 			headers: event.request.headers,
 			body: {
 				provider: "google",
-				callbackURL: "/auth",
+				callbackURL: "/",
 				errorCallbackURL: "/auth",
 				disableRedirect: true
 			}

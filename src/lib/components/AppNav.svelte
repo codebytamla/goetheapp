@@ -14,6 +14,12 @@
 		if (email && email.length > 0) return email[0].toUpperCase();
 		return "L";
 	};
+
+	const getDisplayName = (name?: string | null, email?: string | null) => {
+		if (name && name.length > 0) return name;
+		if (email && email.length > 0) return email.split("@")[0];
+		return "Learner";
+	};
 </script>
 
 <nav class="app-nav">
@@ -34,9 +40,21 @@
 			<span>3 Day Streak</span>
 		</div>
 		<div class="nav-divider"></div>
-		<a href="/auth" class="user-profile" aria-label="Open account">
-			<div class="avatar">{getInitial(user?.name, user?.email)}</div>
-		</a>
+		<details class="profile-menu">
+			<summary class="user-profile" aria-label="Open account menu">
+				<div class="avatar">{getInitial(user?.name, user?.email)}</div>
+			</summary>
+			<div class="profile-dropdown">
+				<p class="profile-name">{getDisplayName(user?.name, user?.email)}</p>
+				{#if user?.email}
+					<p class="profile-email">{user.email}</p>
+				{/if}
+				<a href="/auth" class="profile-link">Manage account</a>
+				<form method="POST" action="/auth?/signOut">
+					<button type="submit" class="profile-signout">Sign out</button>
+				</form>
+			</div>
+		</details>
 	</div>
 </nav>
 
@@ -133,6 +151,67 @@
 		justify-content: center;
 		font-weight: 600;
 		font-size: 0.9rem;
+	}
+
+	.profile-menu {
+		position: relative;
+	}
+
+	.user-profile {
+		display: flex;
+		align-items: center;
+		list-style: none;
+		cursor: pointer;
+	}
+
+	.user-profile::-webkit-details-marker {
+		display: none;
+	}
+
+	.profile-dropdown {
+		position: absolute;
+		top: calc(100% + 0.6rem);
+		right: 0;
+		width: 220px;
+		background: var(--bg-card);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-md);
+		padding: var(--space-md);
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.profile-name {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+
+	.profile-email {
+		font-size: 0.82rem;
+		color: var(--text-muted);
+		margin-bottom: 0.2rem;
+	}
+
+	.profile-link,
+	.profile-signout {
+		font: inherit;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		background: transparent;
+		border: none;
+		padding: 0.45rem 0.5rem;
+		border-radius: var(--radius-sm);
+		text-align: left;
+		cursor: pointer;
+		width: 100%;
+	}
+
+	.profile-link:hover,
+	.profile-signout:hover {
+		background: var(--bg-elevated);
+		color: var(--text-primary);
 	}
 
 	@media (max-width: 768px) {
