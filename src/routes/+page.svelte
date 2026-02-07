@@ -198,10 +198,10 @@
 						<span class="stat-label">CEFR Level</span>
 						<span class="stat-value">B1</span>
 					</div>
-					<div class="stat-card">
+					<!-- <div class="stat-card">
 						<span class="stat-label">Exam Date</span>
 						<span class="stat-value text-muted">Set Date</span>
-					</div>
+					</div> -->
 				</div>
 			</header>
 

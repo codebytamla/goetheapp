@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/state";
-	import { Languages, TrendingUp } from "@lucide/svelte";
+	import { Bird, Menu, X } from "@lucide/svelte";
 
 	type NavUser = {
 		name?: string | null;
@@ -8,6 +8,7 @@
 	};
 
 	let { user }: { user?: NavUser | null } = $props();
+	let mobileMenuOpen = $state(false);
 
 	const getInitial = (name?: string | null, email?: string | null) => {
 		if (name && name.length > 0) return name[0];
@@ -20,41 +21,62 @@
 		if (email && email.length > 0) return email.split("@")[0];
 		return "Learner";
 	};
+
+	const toggleMobileMenu = () => {
+		mobileMenuOpen = !mobileMenuOpen;
+	};
+
+	const closeMobileMenu = () => {
+		mobileMenuOpen = false;
+	};
 </script>
 
 <nav class="app-nav">
-	<div class="nav-brand">
-		<div class="nav-logo-circle">
-			<Languages size={20} aria-hidden="true" />
-		</div>
-		<span class="nav-title">Goethe Trainer</span>
-	</div>
-	<div class="nav-links">
-		<a href="/" class:active={page.url.pathname === "/"} class="nav-link">Dashboard</a>
-		<a href="/history" class:active={page.url.pathname === "/history"} class="nav-link">History</a>
-		<a href="/progress" class:active={page.url.pathname === "/progress"} class="nav-link">Progress</a>
-	</div>
-	<div class="nav-user">
-		<div class="user-streak">
-			<TrendingUp size={16} style="color: #16a34a;" />
-			<span>3 Day Streak</span>
-		</div>
-		<div class="nav-divider"></div>
-		<details class="profile-menu">
-			<summary class="user-profile" aria-label="Open account menu">
-				<div class="avatar">{getInitial(user?.name, user?.email)}</div>
-			</summary>
-			<div class="profile-dropdown">
-				<p class="profile-name">{getDisplayName(user?.name, user?.email)}</p>
-				{#if user?.email}
-					<p class="profile-email">{user.email}</p>
-				{/if}
-				<a href="/auth" class="profile-link">Manage account</a>
-				<form method="POST" action="/auth?/signOut">
-					<button type="submit" class="profile-signout">Sign out</button>
-				</form>
+	<div class="nav-top-row">
+		<div class="nav-brand">
+			<div class="nav-logo-circle">
+				<Bird size={20} aria-hidden="true" />
 			</div>
-		</details>
+			<span class="nav-title">Goethe Sim</span>
+		</div>
+		<button
+			type="button"
+			class="hamburger-btn"
+			aria-expanded={mobileMenuOpen}
+			aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+			onclick={toggleMobileMenu}
+		>
+			{#if mobileMenuOpen}
+				<X size={18} />
+			{:else}
+				<Menu size={18} />
+			{/if}
+		</button>
+	</div>
+
+	<div class="nav-main" class:mobile-open={mobileMenuOpen}>
+		<div class="nav-links">
+			<a href="/" class:active={page.url.pathname === "/"} class="nav-link" onclick={closeMobileMenu}>Dashboard</a>
+			<a href="/history" class:active={page.url.pathname === "/history"} class="nav-link" onclick={closeMobileMenu}>History</a>
+			<a href="/progress" class:active={page.url.pathname === "/progress"} class="nav-link" onclick={closeMobileMenu}>Progress</a>
+		</div>
+		<div class="nav-user">
+			<details class="profile-menu">
+				<summary class="user-profile" aria-label="Open account menu">
+					<div class="avatar">{getInitial(user?.name, user?.email)}</div>
+				</summary>
+				<div class="profile-dropdown">
+					<p class="profile-name">{getDisplayName(user?.name, user?.email)}</p>
+					{#if user?.email}
+						<p class="profile-email">{user.email}</p>
+					{/if}
+					<a href="/auth" class="profile-link" onclick={closeMobileMenu}>Manage account</a>
+					<form method="POST" action="/auth?/signOut">
+						<button type="submit" class="profile-signout">Sign out</button>
+					</form>
+				</div>
+			</details>
+		</div>
 	</div>
 </nav>
 
@@ -66,11 +88,21 @@
 		background: rgba(255, 255, 255, 0.9);
 		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--border-subtle);
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		column-gap: var(--space-lg);
+		padding: 0.75rem var(--space-lg);
+		margin-bottom: var(--space-lg);
+	}
+
+	.nav-top-row {
+		grid-column: 1;
+		justify-self: start;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.75rem var(--space-lg);
-		margin-bottom: var(--space-lg);
+		gap: var(--space-md);
 	}
 
 	.nav-brand {
@@ -96,9 +128,33 @@
 		letter-spacing: -0.01em;
 	}
 
+	.hamburger-btn {
+		display: none;
+		width: 2.25rem;
+		height: 2.25rem;
+		border: 1px solid var(--border-subtle);
+		background: var(--bg-card);
+		color: var(--text-primary);
+		border-radius: var(--radius-md);
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+	}
+
+	.hamburger-btn:hover {
+		background: var(--bg-elevated);
+	}
+
+	.nav-main {
+		display: contents;
+	}
+
 	.nav-links {
+		grid-column: 2;
+		justify-self: center;
 		display: flex;
 		gap: 0.25rem;
+		justify-content: center;
 	}
 
 	.nav-link {
@@ -117,27 +173,10 @@
 	}
 
 	.nav-user {
+		grid-column: 3;
+		justify-self: end;
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-	}
-
-	.user-streak {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		background: var(--bg-elevated);
-		padding: 0.25rem 0.75rem;
-		border-radius: var(--radius-full);
-	}
-
-	.nav-divider {
-		width: 1px;
-		height: 24px;
-		background: var(--border-default);
 	}
 
 	.avatar {
@@ -216,8 +255,52 @@
 
 	@media (max-width: 768px) {
 		.app-nav {
+			display: flex;
 			flex-direction: column;
-			gap: 1rem;
+			align-items: stretch;
+			gap: 0.75rem;
+		}
+
+		.hamburger-btn {
+			display: inline-flex;
+		}
+
+		.nav-main {
+			display: none;
+			flex-direction: column;
+			align-items: stretch;
+			gap: var(--space-md);
+			padding-top: var(--space-sm);
+			border-top: 1px solid var(--border-subtle);
+		}
+
+		.nav-main.mobile-open {
+			display: flex;
+		}
+
+		.nav-links {
+			flex-direction: column;
+			gap: var(--space-xs);
+		}
+
+		.nav-link {
+			display: block;
+		}
+
+		.nav-user {
+			width: 100%;
+			justify-content: flex-end;
+		}
+
+		.profile-menu {
+			max-width: 100%;
+		}
+
+		.profile-dropdown {
+			position: static;
+			width: 100%;
+			max-width: 100%;
+			margin-top: var(--space-sm);
 		}
 	}
 </style>
