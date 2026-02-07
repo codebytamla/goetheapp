@@ -40,3 +40,37 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## D1 Database
+
+This project is bound to a Cloudflare D1 database named `goetheapp-db` with binding `DB`.
+
+```sh
+# create a new migration file
+npm run db:migration:create -- add_feature_name
+
+# apply migrations locally (for wrangler dev)
+npm run db:migrate:local
+
+# apply migrations remotely (Cloudflare D1)
+npm run db:migrate:remote
+```
+
+## Magic Link Auth (Better Auth)
+
+The app includes Better Auth magic-link sign-in at `/auth`.
+
+Required secret in Cloudflare:
+
+```sh
+wrangler secret put BETTER_AUTH_SECRET
+```
+
+Optional email delivery via Resend:
+
+```sh
+wrangler secret put RESEND_API_KEY
+wrangler secret put AUTH_FROM_EMAIL
+```
+
+Without `RESEND_API_KEY`, magic links are logged to Worker logs for development.

@@ -11,7 +11,11 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"deploy": "npm run build && wrangler deploy",
-		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
+		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
+		"db:list": "wrangler d1 list",
+		"db:migration:create": "wrangler d1 migrations create goetheapp-db",
+		"db:migrate:local": "wrangler d1 migrations apply goetheapp-db --local",
+		"db:migrate:remote": "wrangler d1 migrations apply goetheapp-db --remote"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.0",
@@ -24,5 +28,9 @@
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1",
 		"wrangler": "^4.63.0"
+	},
+	"dependencies": {
+		"better-auth": "^1.4.18",
+		"drizzle-orm": "^0.45.1"
 	}
 }
