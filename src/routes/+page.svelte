@@ -1,55 +1,55 @@
 <script lang="ts">
+	import { BookOpen, Clock3, Headphones, Languages, ListChecks, Mic, PenTool } from "@lucide/svelte";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
+
+	const moduleIcons = {
+		lesen: BookOpen,
+		hoeren: Headphones,
+		schreiben: PenTool,
+		sprechen: Mic
+	};
 
 	const modules = [
 		{
 			id: "lesen",
 			name: "Lesen",
 			subtitle: "Reading",
-			icon: "📖",
 			description: "Master text comprehension with authentic Goethe-style passages",
 			tasks: "5 Teile",
 			duration: "65 min",
 			skills: ["Headline matching", "Detail extraction", "Multiple choice"],
-			progress: 71,
 			accent: "reading"
 		},
 		{
 			id: "hoeren",
 			name: "Hören",
-			subtitle: "Listening", 
-			icon: "🎧",
+			subtitle: "Listening",
 			description: "Train your ear with announcements, dialogues, and interviews",
 			tasks: "4 Teile",
 			duration: "40 min",
 			skills: ["Keyword capture", "Note-taking", "Speaker identification"],
-			progress: 68,
 			accent: "listening"
 		},
 		{
 			id: "schreiben",
 			name: "Schreiben",
 			subtitle: "Writing",
-			icon: "✍️",
 			description: "Perfect your formal emails and argumentative essays",
 			tasks: "2 Teile",
 			duration: "75 min",
 			skills: ["Formal register", "Connectors", "Paragraph structure"],
-			progress: 64,
 			accent: "writing"
 		},
 		{
 			id: "sprechen",
 			name: "Sprechen",
 			subtitle: "Speaking",
-			icon: "🎤",
 			description: "Simulate the oral exam with AI-powered feedback",
 			tasks: "3 Teile",
 			duration: "15 min",
 			skills: ["Fluency", "Pronunciation", "Argument structure"],
-			progress: 59,
 			accent: "speaking"
 		}
 	];
@@ -79,8 +79,9 @@
 			</div>
 			<div class="landing-modules">
 				{#each modules as mod, i}
+					{@const Icon = moduleIcons[mod.id]}
 					<div class="landing-module-pill {mod.accent}" style="animation-delay: {i * 100}ms">
-						<span>{mod.icon}</span>
+						<Icon size={16} aria-hidden="true" />
 						<span>{mod.name}</span>
 					</div>
 				{/each}
@@ -92,7 +93,7 @@
 		<!-- Navigation -->
 		<nav class="nav">
 			<div class="nav-brand">
-				<span class="nav-logo">🇩🇪</span>
+				<span class="nav-logo"><Languages size={20} aria-hidden="true" /></span>
 				<span class="nav-title">Goethe Trainer</span>
 			</div>
 			<div class="nav-links">
@@ -115,27 +116,16 @@
 
 			<div class="modules-grid">
 				{#each modules as mod, i}
+					{@const Icon = moduleIcons[mod.id]}
 					<a 
 						href="/{mod.id}" 
 						class="module-card {mod.accent}"
 						style="animation-delay: {i * 80}ms"
 					>
 						<div class="module-header">
-							<span class="module-icon">{mod.icon}</span>
-							<div class="module-progress-ring">
-								<svg viewBox="0 0 36 36">
-									<path
-										class="ring-bg"
-										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-									/>
-									<path
-										class="ring-fill"
-										stroke-dasharray="{mod.progress}, 100"
-										d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-									/>
-								</svg>
-								<span class="ring-value">{mod.progress}%</span>
-							</div>
+							<span class="module-icon">
+								<Icon size={30} aria-hidden="true" />
+							</span>
 						</div>
 						
 						<div class="module-body">
@@ -146,20 +136,22 @@
 
 						<div class="module-meta">
 							<span class="meta-item">
-								<span class="meta-icon">📋</span>
+								<ListChecks size={14} aria-hidden="true" />
 								{mod.tasks}
 							</span>
 							<span class="meta-item">
-								<span class="meta-icon">⏱️</span>
+								<Clock3 size={14} aria-hidden="true" />
 								{mod.duration}
 							</span>
 						</div>
 
+						<!--
 						<div class="module-skills">
 							{#each mod.skills as skill}
 								<span class="skill-tag">{skill}</span>
 							{/each}
 						</div>
+						-->
 
 						<div class="module-cta">
 							<span>Start Practice</span>
@@ -469,47 +461,6 @@
 
 	.module-icon {
 		font-size: 2.5rem;
-	}
-
-	.module-progress-ring {
-		position: relative;
-		width: 48px;
-		height: 48px;
-	}
-
-	.module-progress-ring svg {
-		width: 100%;
-		height: 100%;
-		transform: rotate(-90deg);
-	}
-
-	.ring-bg {
-		fill: none;
-		stroke: var(--bg-elevated);
-		stroke-width: 3;
-	}
-
-	.ring-fill {
-		fill: none;
-		stroke-width: 3;
-		stroke-linecap: round;
-		transition: stroke-dasharray 1s ease;
-	}
-
-	.reading .ring-fill { stroke: var(--reading-primary); }
-	.listening .ring-fill { stroke: var(--listening-primary); }
-	.writing .ring-fill { stroke: var(--writing-primary); }
-	.speaking .ring-fill { stroke: var(--speaking-primary); }
-
-	.ring-value {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.625rem;
-		font-weight: 700;
-		color: var(--text-secondary);
 	}
 
 	.module-body {
