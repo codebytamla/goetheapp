@@ -66,11 +66,37 @@ Required secret in Cloudflare:
 wrangler secret put BETTER_AUTH_SECRET
 ```
 
-Optional email delivery via Resend:
+Optional email delivery via Cloudflare Email Service (if your account has access):
+
+```sh
+# Example binding name used by the app:
+# SEND_EMAIL
+```
+
+Optional fallback email delivery via Resend:
 
 ```sh
 wrangler secret put RESEND_API_KEY
 wrangler secret put AUTH_FROM_EMAIL
 ```
 
-Without `RESEND_API_KEY`, magic links are logged to Worker logs for development.
+Send order is:
+1. `SEND_EMAIL` (Cloudflare Email Service binding, if present)
+2. Resend (`RESEND_API_KEY`)
+3. Worker log output (development fallback)
+
+## Google Sign-In (Better Auth)
+
+Set Google OAuth credentials:
+
+```sh
+wrangler secret put GOOGLE_CLIENT_ID
+wrangler secret put GOOGLE_CLIENT_SECRET
+```
+
+In Google Cloud Console OAuth client settings, add redirect URIs:
+
+```txt
+https://goetheapp.maximusanderson.workers.dev/api/auth/callback/google
+http://localhost:8787/api/auth/callback/google
+```
