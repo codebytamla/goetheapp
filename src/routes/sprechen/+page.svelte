@@ -843,7 +843,7 @@
 		gap: var(--space-md);
 		padding: var(--space-lg) var(--space-2xl);
 		background: linear-gradient(135deg, var(--speaking-primary), var(--speaking-secondary));
-		color: var(--bg-primary);
+		color: #ffffff;
 		font-family: var(--font-body);
 		font-size: 1.125rem;
 		font-weight: 700;
@@ -873,7 +873,7 @@
 	:global(.dialog-overlay) {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.7);
+		background: rgba(15, 23, 42, 0.45);
 		backdrop-filter: blur(4px);
 		z-index: 100;
 		animation: fadeIn 0.2s ease forwards;
