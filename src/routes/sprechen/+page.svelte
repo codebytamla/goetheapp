@@ -1,1017 +1,492 @@
 <script lang="ts">
-	import { Accordion, Dialog, RadioGroup, Separator, Tabs } from "bits-ui";
-	import {
-		ArrowLeft,
-		Check,
-		ClipboardList,
-		Clock3,
-		Lightbulb,
-		Mic,
-		Play,
-		Plus,
-		Search,
-		Target
-	} from "@lucide/svelte";
+	import { ArrowLeft, ArrowRight, Clock3, ClipboardList } from "@lucide/svelte";
+	import type { PageData } from "./$types";
 
-	let selectedMode = $state<"full" | "teil">("full");
-	let selectedTeil = $state<string>("teil1");
-	let showStartDialog = $state(false);
+	type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
-	const teile = [
-		{
-			id: "teil1",
-			name: "Teil 1",
-			title: "Gemeinsam etwas planen",
-			description: "Plan something together with your partner. You'll receive a scenario and must discuss and agree on details.",
-			duration: "3 min",
-			skills: ["Negotiation", "Making suggestions", "Agreeing/Disagreeing"],
-			example: "You and your friend want to organize a birthday party. Discuss and decide on the details.",
-			tips: [
-				"Start with an opening phrase like 'Also, ich schlage vor...'",
-				"React to your partner's suggestions",
-				"Use connectors like 'außerdem', 'einerseits...andererseits'",
-				"Come to a clear conclusion"
+	type SpeakingTeil = {
+		id: string;
+		name: string;
+		title: string;
+		duration: string;
+		description: string;
+		skills: string[];
+	};
+
+	type SpeakingConfig = {
+		totalDuration: string;
+		fullDescription: string;
+		teile: SpeakingTeil[];
+	};
+
+	let { data }: { data: PageData } = $props();
+
+	const levelConfigs: Record<CefrLevel, SpeakingConfig> = {
+		A1: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full A1 oral format with 3 Teile: introduce yourself, answer simple questions, and complete a short partner task.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Sich vorstellen",
+					duration: "3 min",
+					description: "Give simple personal information about yourself.",
+					skills: ["Basic personal info", "Simple sentence production"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Fragen stellen und antworten",
+					duration: "5 min",
+					description: "Ask and answer short everyday questions using prompts.",
+					skills: ["Question forms", "Everyday vocabulary"]
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Gemeinsame Aufgabe",
+					duration: "5 min",
+					description: "Plan a simple shared activity with your partner.",
+					skills: ["Simple negotiation", "Functional phrases"]
+				}
 			]
 		},
-		{
-			id: "teil2",
-			name: "Teil 2",
-			title: "Ein Thema präsentieren",
-			description: "Give a short presentation on a given topic. Structure your talk with introduction, main points, and conclusion.",
-			duration: "4 min",
-			skills: ["Presentation structure", "Expressing opinions", "Personal experience"],
-			example: "Present on the topic 'Learning a foreign language' - advantages, disadvantages, and your personal experience.",
-			tips: [
-				"Structure: Introduction → Main points → Personal opinion → Conclusion",
-				"Use phrases like 'Ich möchte heute über... sprechen'",
-				"Give concrete examples from your experience",
-				"End with a clear summary"
+		A2: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full A2 oral format with 3 Teile, focused on practical communication in common daily situations.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Sich vorstellen",
+					duration: "3 min",
+					description: "Introduce yourself with slightly more detail and structure.",
+					skills: ["Personal narration", "Connected short statements"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Alltagsgespräche",
+					duration: "5 min",
+					description: "Exchange information and respond in everyday contexts.",
+					skills: ["Clarifying questions", "Short interaction turns"]
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Etwas zusammen planen",
+					duration: "5 min",
+					description: "Coordinate a simple plan and agree on details.",
+					skills: ["Making suggestions", "Agreeing and rejecting politely"]
+				}
 			]
 		},
-		{
-			id: "teil3",
-			name: "Teil 3",
-			title: "Über ein Thema sprechen",
-			description: "Discuss the topic from Teil 2 with your partner. Ask questions, express opinions, and react appropriately.",
-			duration: "3 min",
-			skills: ["Discussion", "Asking questions", "Reacting to opinions"],
-			example: "After your partner's presentation about 'Learning a foreign language', ask follow-up questions and share your views.",
-			tips: [
-				"Listen carefully to the presentation",
-				"Ask genuine questions about the topic",
-				"Share your own perspective with 'Meiner Meinung nach...'",
-				"Show interest with phrases like 'Das finde ich interessant...'"
+		B1: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full B1 oral format with 3 Teile: collaborative planning, short presentation, and follow-up discussion.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Gemeinsam etwas planen",
+					duration: "3 min",
+					description: "Work with your partner to make a concrete plan.",
+					skills: ["Negotiation", "Suggestion building"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Ein Thema präsentieren",
+					duration: "4 min",
+					description: "Give a structured short presentation on a familiar topic.",
+					skills: ["Presentation structure", "Explaining viewpoints"]
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Über ein Thema sprechen",
+					duration: "3 min",
+					description: "Discuss the presented topic and react to your partner.",
+					skills: ["Discussion flow", "Follow-up questions"]
+				}
+			]
+		},
+		B2: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full B2 oral format with 2 Teile: a longer presentation and a deeper argument-based discussion.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Präsentation",
+					duration: "6 min",
+					description: "Present a topic with clear argumentation and examples.",
+					skills: ["Argument development", "Structured delivery"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Diskussion",
+					duration: "7 min",
+					description: "Discuss positions, react critically, and justify your stance.",
+					skills: ["Counter-arguments", "Opinion defense"]
+				}
+			]
+		},
+		C1: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full C1 oral format with 2 Teile focused on high-level argumentation and nuanced discussion.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Präsentation",
+					duration: "7 min",
+					description: "Deliver an organized presentation with a precise position.",
+					skills: ["Nuanced language", "Logical coherence"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Diskussion",
+					duration: "7 min",
+					description: "Analyze and debate viewpoints with control and flexibility.",
+					skills: ["Spontaneous reactions", "Advanced interaction"]
+				}
+			]
+		},
+		C2: {
+			totalDuration: "around 15 minutes",
+			fullDescription:
+				"Run the full C2 oral format with 2 Teile requiring precise, flexible, and sophisticated spoken German.",
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Präsentation",
+					duration: "7 min",
+					description: "Present a complex topic with depth, clarity, and style.",
+					skills: ["Complex synthesis", "Rhetorical control"]
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Diskussion",
+					duration: "7 min",
+					description: "Sustain an advanced discussion with precise argument handling.",
+					skills: ["Fine distinctions", "High-level interaction"]
+				}
 			]
 		}
-	];
+	};
 
-	function startPractice() {
-		showStartDialog = true;
-	}
+	const getLevelConfig = (level: string): SpeakingConfig => {
+		const typedLevel = level as CefrLevel;
+		return levelConfigs[typedLevel] ?? levelConfigs.B1;
+	};
 
-	function confirmStart() {
-		showStartDialog = false;
-		// Navigate to practice session
-		if (selectedMode === "full") {
-			window.location.href = "/sprechen/practice?mode=full";
-		} else {
-			window.location.href = `/sprechen/practice?mode=teil&teil=${selectedTeil}`;
-		}
-	}
+	let levelConfig = $derived(getLevelConfig(data.selectedLevel));
 </script>
 
 <svelte:head>
 	<title>Sprechen | Goethe Prüfung Practice</title>
-	<meta name="description" content="Practice the Speaking module of the Goethe exam with AI-powered feedback." />
+	<meta
+		name="description"
+		content="Practice the speaking module with a level-specific exam format and full-test simulation."
+	/>
 </svelte:head>
 
 <div class="page-container">
-	<!-- Back Navigation -->
-	<nav class="back-nav">
+	<nav class="top-nav">
 		<a href="/" class="back-link">
-			<ArrowLeft class="back-icon" />
+			<ArrowLeft size={16} />
 			<span>Back to Dashboard</span>
 		</a>
+		<span class="level-pill">{data.selectedLevel} Format</span>
 	</nav>
 
-	<!-- Header -->
-	<header class="module-header">
-		<div class="header-content">
-			<div class="header-icon">
-				<Mic />
-			</div>
-			<div class="header-text">
-				<h1>Sprechen</h1>
-				<p class="header-subtitle">Speaking Module</p>
-			</div>
-		</div>
-		<div class="header-meta">
-			<span class="meta-badge">
-				<Clock3 class="badge-icon" />
-				~15 min
-			</span>
-			<span class="meta-badge">
-				<ClipboardList class="badge-icon" />
-				3 Teile
-			</span>
-			<span class="meta-badge progress">
-				59% mastery
-			</span>
-		</div>
+	<header class="page-header">
+		<h1>Sprechen</h1>
+		<p>This page adapts to your global CEFR level setting. Current structure: {levelConfig.teile.length} Teile.</p>
 	</header>
 
-	<Separator.Root decorative class="section-divider" />
-
-	<!-- Mode Selection -->
-	<section class="mode-section">
-		<h2>Choose Practice Mode</h2>
-		<p>Take the full speaking test or focus on a specific part</p>
-
-		<RadioGroup.Root bind:value={selectedMode} class="mode-grid">
-			<label class="mode-card" class:selected={selectedMode === "full"}>
-				<RadioGroup.Item value="full" class="radio-input" />
-				<div class="mode-content">
-					<div class="mode-icon-wrap full">
-						<Target class="mode-icon" />
-					</div>
-					<div class="mode-details">
-						<h3>Full Speaking Test</h3>
-						<p>Complete all 3 parts in sequence, simulating real exam conditions</p>
-						<div class="mode-info">
-							<span><Clock3 class="meta-icon" /> ~15 minutes</span>
-							<span><ClipboardList class="meta-icon" /> All 3 Teile</span>
-						</div>
-					</div>
-					<div class="mode-check">
-						<Check class="mode-check-icon" />
-					</div>
-				</div>
-			</label>
-
-			<label class="mode-card" class:selected={selectedMode === "teil"}>
-				<RadioGroup.Item value="teil" class="radio-input" />
-				<div class="mode-content">
-					<div class="mode-icon-wrap teil">
-						<Search class="mode-icon" />
-					</div>
-					<div class="mode-details">
-						<h3>Individual Teil</h3>
-						<p>Focus on one specific part for targeted practice and improvement</p>
-						<div class="mode-info">
-							<span><Clock3 class="meta-icon" /> 3-4 minutes</span>
-							<span><ClipboardList class="meta-icon" /> 1 Teil</span>
-						</div>
-					</div>
-					<div class="mode-check">
-						<Check class="mode-check-icon" />
-					</div>
-				</div>
-			</label>
-		</RadioGroup.Root>
+	<section class="full-test-card">
+		<div>
+			<span class="card-label">Recommended</span>
+			<h2>Full Speaking Test</h2>
+			<p>{levelConfig.fullDescription}</p>
+			<div class="quick-stats">
+				<span><Clock3 size={14} /> {levelConfig.totalDuration}</span>
+				<span><ClipboardList size={14} /> {levelConfig.teile.length} Teile</span>
+			</div>
+		</div>
+		<a href="/sprechen/practice?mode=full&level={data.selectedLevel}" class="btn btn-primary full-test-cta">
+			Start Full Test
+			<ArrowRight size={16} />
+		</a>
 	</section>
 
-	<!-- Teil Selection (when individual Teil is selected) -->
-	{#if selectedMode === "teil"}
-		<section class="teil-section">
-			<h2>Select a Teil</h2>
-			<p>Choose which part of the speaking exam you want to practice</p>
+	<section class="teile-section">
+		<div class="section-head">
+			<h2>Practice by Teil</h2>
+			<p>Target one part when you want focused repetition.</p>
+		</div>
 
-			<Tabs.Root bind:value={selectedTeil} class="teil-tabs">
-				<Tabs.List class="teil-list">
-					{#each teile as teil}
-						<Tabs.Trigger value={teil.id} class="teil-trigger">
-							<span class="teil-num">{teil.name}</span>
-							<span class="teil-title">{teil.title}</span>
-						</Tabs.Trigger>
-					{/each}
-				</Tabs.List>
-
-				{#each teile as teil}
-					<Tabs.Content value={teil.id} class="teil-content">
-						<div class="teil-card">
-							<div class="teil-header">
-								<div>
-									<span class="teil-badge">{teil.name}</span>
-									<h3>{teil.title}</h3>
-								</div>
-								<span class="teil-duration"><Clock3 class="meta-icon" /> {teil.duration}</span>
-							</div>
-							
-							<p class="teil-description">{teil.description}</p>
-							
-							<div class="teil-skills">
-								<span class="skills-label">Skills tested:</span>
-								<div class="skills-list">
-									{#each teil.skills as skill}
-										<span class="skill-chip">{skill}</span>
-									{/each}
-								</div>
-							</div>
-
-							<div class="teil-example">
-								<span class="example-label">Example task:</span>
-								<p class="example-text">"{teil.example}"</p>
-							</div>
-
-							<Accordion.Root class="tips-accordion">
-								<Accordion.Item value="tips" class="tips-item">
-									<Accordion.Header>
-										<Accordion.Trigger class="tips-trigger">
-											<span class="tips-label"><Lightbulb class="tips-icon" /> Tips for this Teil</span>
-											<Plus class="trigger-icon" />
-										</Accordion.Trigger>
-									</Accordion.Header>
-									<Accordion.Content class="tips-content">
-										<ul class="tips-list">
-											{#each teil.tips as tip}
-												<li>{tip}</li>
-											{/each}
-										</ul>
-									</Accordion.Content>
-								</Accordion.Item>
-							</Accordion.Root>
-						</div>
-					</Tabs.Content>
-				{/each}
-			</Tabs.Root>
-		</section>
-	{/if}
-
-	<!-- Teile Overview (when full test is selected) -->
-	{#if selectedMode === "full"}
-		<section class="overview-section">
-			<h2>Test Overview</h2>
-			<p>You'll complete all three parts in the following order</p>
-
-			<div class="overview-timeline">
-				{#each teile as teil, i}
-					<div class="timeline-item">
-						<div class="timeline-marker">
-							<span class="marker-num">{i + 1}</span>
-							{#if i < teile.length - 1}
-								<div class="marker-line"></div>
-							{/if}
-						</div>
-						<div class="timeline-content">
-							<div class="timeline-header">
-								<h3>{teil.name}: {teil.title}</h3>
-								<span class="timeline-duration">{teil.duration}</span>
-							</div>
-							<p>{teil.description}</p>
-							<div class="timeline-skills">
-								{#each teil.skills as skill}
-									<span class="skill-chip small">{skill}</span>
-								{/each}
-							</div>
-						</div>
+		<div class="teile-grid">
+			{#each levelConfig.teile as teil}
+				<article class="teil-card">
+					<div class="teil-meta">
+						<span class="teil-badge">{teil.name}</span>
+						<span class="teil-time"><Clock3 size={14} /> {teil.duration}</span>
 					</div>
-				{/each}
-			</div>
-		</section>
-	{/if}
+					<h3>{teil.title}</h3>
+					<p>{teil.description}</p>
+					<div class="skills">
+						{#each teil.skills as skill}
+							<span class="skill-chip">{skill}</span>
+						{/each}
+					</div>
+					<a href="/sprechen/practice?mode=teil&teil={teil.id}&level={data.selectedLevel}" class="teil-cta">
+						Start {teil.name}
+						<ArrowRight size={15} />
+					</a>
+				</article>
+			{/each}
+		</div>
+	</section>
 
-	<!-- Start Button -->
-	<div class="start-section">
-		<button class="start-button" onclick={startPractice}>
-			<Play class="start-icon" />
-			<span>Start {selectedMode === "full" ? "Full Test" : teile.find(t => t.id === selectedTeil)?.name}</span>
-		</button>
-		<p class="start-hint">
-			{#if selectedMode === "full"}
-				You'll practice all 3 parts with short breaks between each
-			{:else}
-				Focus practice on {teile.find(t => t.id === selectedTeil)?.title}
-			{/if}
-		</p>
-	</div>
+	<p class="level-note">
+		Need a different format? Change your global level on the <a href="/">dashboard selector</a>.
+	</p>
 </div>
-
-<!-- Start Confirmation Dialog -->
-<Dialog.Root bind:open={showStartDialog}>
-	<Dialog.Portal>
-		<Dialog.Overlay class="dialog-overlay" />
-		<Dialog.Content class="dialog-content">
-			<Dialog.Title class="dialog-title">Ready to Start?</Dialog.Title>
-			<Dialog.Description class="dialog-description">
-				{#if selectedMode === "full"}
-					You're about to start the full speaking test with all 3 Teile. This will take approximately 15 minutes.
-				{:else}
-					You're about to practice {teile.find(t => t.id === selectedTeil)?.name}: {teile.find(t => t.id === selectedTeil)?.title}. This will take approximately {teile.find(t => t.id === selectedTeil)?.duration}.
-				{/if}
-			</Dialog.Description>
-			<div class="dialog-checklist">
-				<p>Before you begin:</p>
-				<ul>
-					<li><Check class="check-icon" /> Find a quiet place to speak</li>
-					<li><Check class="check-icon" /> Make sure your microphone works</li>
-					<li><Check class="check-icon" /> Prepare to speak clearly in German</li>
-				</ul>
-			</div>
-			<div class="dialog-actions">
-				<button class="btn btn-secondary" onclick={() => showStartDialog = false}>Cancel</button>
-				<button class="btn btn-primary" onclick={confirmStart}>Start Practice</button>
-			</div>
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
 
 <style>
 	.page-container {
-		min-height: 100vh;
-		padding: var(--space-lg);
-		max-width: 1000px;
+		max-width: 1040px;
 		margin: 0 auto;
+		padding: var(--space-lg);
+		min-height: 100vh;
 	}
 
-	/* === Back Navigation === */
-	.back-nav {
+	.top-nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		margin-bottom: var(--space-xl);
-		animation: slideDown 0.4s ease forwards;
 	}
 
 	.back-link {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 		color: var(--text-secondary);
 		font-weight: 500;
-		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
-		transition: all var(--transition-fast);
 	}
 
 	.back-link:hover {
 		color: var(--text-primary);
-		background: var(--bg-card);
 	}
 
-	.back-icon {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
-
-	/* === Header === */
-	.module-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: var(--space-lg);
-		animation: slideUp 0.5s ease forwards;
-	}
-
-	.header-content {
-		display: flex;
-		align-items: center;
-		gap: var(--space-lg);
-	}
-
-	.header-icon {
-		padding: var(--space-lg);
-		background: var(--speaking-glow);
-		border-radius: var(--radius-xl);
-	}
-	.header-icon :global(svg) {
-		width: 3rem;
-		height: 3rem;
-	}
-
-	.header-text h1 {
-		font-size: 2.5rem;
+	.level-pill {
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
 		color: var(--speaking-primary);
-		margin: 0;
-	}
-
-	.header-subtitle {
-		font-size: 1.125rem;
-		color: var(--text-secondary);
-		margin: var(--space-xs) 0 0;
-	}
-
-	.header-meta {
-		display: flex;
-		gap: var(--space-sm);
-	}
-
-	.meta-badge {
-		display: flex;
-		align-items: center;
-		gap: var(--space-xs);
-		padding: var(--space-sm) var(--space-md);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
+		background: var(--speaking-glow);
+		border: 1px solid color-mix(in oklab, var(--speaking-primary) 35%, white);
 		border-radius: var(--radius-full);
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-	.badge-icon {
-		width: 0.95rem;
-		height: 0.95rem;
+		padding: 0.35rem 0.65rem;
 	}
 
-	.meta-badge.progress {
-		background: var(--speaking-glow);
-		border-color: var(--speaking-primary);
-		color: var(--speaking-secondary);
-	}
-
-	/* === Section Divider === */
-	.section-divider {
-		height: 1px;
-		background: var(--border-subtle);
-		margin: var(--space-xl) 0;
-		border: none;
-	}
-
-	/* === Mode Selection === */
-	.mode-section {
-		animation: slideUp 0.5s ease forwards;
-		animation-delay: 0.1s;
-		opacity: 0;
-		animation-fill-mode: forwards;
-	}
-
-	.mode-section h2 {
-		margin-bottom: var(--space-xs);
-	}
-
-	.mode-section > p {
-		color: var(--text-secondary);
-		margin-bottom: var(--space-xl);
-	}
-
-	.mode-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		gap: var(--space-lg);
-	}
-
-	.mode-card {
-		position: relative;
-		cursor: pointer;
-		background: var(--bg-card);
-		border: 2px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
-		padding: var(--space-xl);
-		transition: all var(--transition-normal);
-	}
-
-	.mode-card:hover {
-		border-color: var(--border-default);
-		background: var(--bg-card-hover);
-	}
-
-	.mode-card.selected {
-		border-color: var(--speaking-primary);
-		background: var(--bg-card-hover);
-		box-shadow: var(--shadow-glow) var(--speaking-glow);
-	}
-
-	.radio-input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.mode-content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-	}
-
-	.mode-icon-wrap {
-		width: 56px;
-		height: 56px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: var(--radius-lg);
-	}
-	.mode-icon {
-		width: 1.6rem;
-		height: 1.6rem;
-	}
-
-	.mode-icon-wrap.full {
-		background: linear-gradient(135deg, var(--speaking-glow), var(--writing-glow));
-	}
-
-	.mode-icon-wrap.teil {
-		background: var(--speaking-glow);
-	}
-
-	.mode-details h3 {
-		font-size: 1.25rem;
-		margin: 0 0 var(--space-xs);
-	}
-
-	.mode-details p {
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		margin: 0;
-	}
-
-	.mode-info {
-		display: flex;
-		gap: var(--space-md);
-		margin-top: var(--space-sm);
-		font-size: 0.8rem;
-		color: var(--text-muted);
-	}
-	.mode-info span {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-xs);
-	}
-
-	.mode-check {
-		position: absolute;
-		top: var(--space-lg);
-		right: var(--space-lg);
-		width: 28px;
-		height: 28px;
-		border: 2px solid var(--border-default);
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		transform: scale(0.8);
-		transition: all var(--transition-fast);
-	}
-
-	.mode-card.selected .mode-check {
-		opacity: 1;
-		transform: scale(1);
-		background: var(--speaking-primary);
-		border-color: var(--speaking-primary);
-		color: white;
-	}
-
-	.mode-check-icon {
-		width: 14px;
-		height: 14px;
-	}
-
-	/* === Teil Section === */
-	.teil-section {
-		margin-top: var(--space-2xl);
-		animation: slideUp 0.4s ease forwards;
-	}
-
-	.teil-section h2 {
-		margin-bottom: var(--space-xs);
-	}
-
-	.teil-section > p {
-		color: var(--text-secondary);
-		margin-bottom: var(--space-xl);
-	}
-
-	.teil-tabs {
-		margin-top: var(--space-lg);
-	}
-
-	.teil-list {
-		display: flex;
-		gap: var(--space-sm);
-		padding: var(--space-sm);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-lg);
+	.page-header {
 		margin-bottom: var(--space-lg);
 	}
 
-	.teil-trigger {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-xs);
-		padding: var(--space-md);
-		background: transparent;
-		border: none;
-		border-radius: var(--radius-md);
-		cursor: pointer;
-		transition: all var(--transition-fast);
-		color: var(--text-secondary);
-	}
-
-	.teil-trigger:hover {
-		background: var(--bg-elevated);
-		color: var(--text-primary);
-	}
-
-	:global(.teil-trigger[data-state="active"]) {
-		background: var(--speaking-glow);
+	.page-header h1 {
+		margin: 0 0 0.35rem;
+		font-size: clamp(1.8rem, 3.4vw, 2.4rem);
 		color: var(--speaking-primary);
 	}
 
-	.teil-num {
+	.page-header p {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.full-test-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-lg);
+		padding: var(--space-xl);
+		background: linear-gradient(115deg, #ffffff 0%, #f5fbff 100%);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-xl);
+		margin-bottom: var(--space-2xl);
+	}
+
+	.card-label {
+		display: inline-block;
+		font-size: 0.72rem;
 		font-weight: 700;
-		font-size: 0.875rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: #0f766e;
+		background: #ccfbf1;
+		border-radius: var(--radius-full);
+		padding: 0.24rem 0.6rem;
+		margin-bottom: var(--space-sm);
 	}
 
-	.teil-title {
-		font-size: 0.75rem;
-		text-align: center;
+	.full-test-card h2 {
+		margin: 0;
+		font-size: 1.55rem;
 	}
 
-	.teil-content {
-		animation: scaleIn 0.3s ease forwards;
+	.full-test-card p {
+		margin: var(--space-sm) 0 0;
+		color: var(--text-secondary);
+		max-width: 60ch;
+		line-height: 1.55;
+	}
+
+	.quick-stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-md);
+		margin-top: var(--space-md);
+	}
+
+	.quick-stats span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.85rem;
+		color: var(--text-muted);
+	}
+
+	.full-test-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		white-space: nowrap;
+	}
+
+	.section-head {
+		margin-bottom: var(--space-lg);
+	}
+
+	.section-head h2 {
+		margin-bottom: 0.3rem;
+	}
+
+	.section-head p {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.teile-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+		gap: var(--space-md);
 	}
 
 	.teil-card {
 		background: var(--bg-card);
 		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
-		padding: var(--space-xl);
+		border-radius: var(--radius-lg);
+		padding: var(--space-lg);
+		display: flex;
+		flex-direction: column;
 	}
 
-	.teil-header {
+	.teil-meta {
 		display: flex;
+		align-items: center;
 		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: var(--space-lg);
+		gap: var(--space-sm);
+		margin-bottom: var(--space-sm);
 	}
 
 	.teil-badge {
-		display: inline-block;
-		font-size: 0.75rem;
-		font-weight: 600;
+		font-size: 0.73rem;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding: var(--space-xs) var(--space-sm);
-		background: var(--speaking-primary);
-		color: white;
-		border-radius: var(--radius-sm);
-		margin-bottom: var(--space-sm);
+		letter-spacing: 0.06em;
+		color: var(--speaking-primary);
 	}
 
-	.teil-header h3 {
-		margin: 0;
-		font-size: 1.5rem;
-	}
-
-	.teil-duration {
-		padding: var(--space-sm) var(--space-md);
-		background: var(--bg-elevated);
-		border-radius: var(--radius-full);
-		font-size: 0.875rem;
-		color: var(--text-secondary);
+	.teil-time {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-xs);
-	}
-
-	.teil-description {
-		font-size: 1rem;
-		line-height: 1.6;
-		color: var(--text-secondary);
-	}
-
-	.teil-skills {
-		margin-top: var(--space-lg);
-	}
-
-	.skills-label {
-		font-size: 0.875rem;
+		gap: 0.3rem;
+		font-size: 0.8rem;
 		color: var(--text-muted);
-		display: block;
-		margin-bottom: var(--space-sm);
 	}
 
-	.skills-list {
+	.teil-card h3 {
+		margin: 0;
+		font-size: 1.08rem;
+	}
+
+	.teil-card p {
+		margin: var(--space-sm) 0 var(--space-md);
+		color: var(--text-secondary);
+		line-height: 1.5;
+	}
+
+	.skills {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-xs);
+		margin-bottom: var(--space-md);
 	}
 
 	.skill-chip {
-		padding: var(--space-xs) var(--space-md);
+		font-size: 0.75rem;
+		padding: 0.24rem 0.55rem;
 		background: var(--bg-elevated);
 		border-radius: var(--radius-full);
-		font-size: 0.875rem;
 		color: var(--text-secondary);
 	}
 
-	.skill-chip.small {
-		font-size: 0.75rem;
-		padding: var(--space-xs) var(--space-sm);
-	}
-
-	.teil-example {
-		margin-top: var(--space-lg);
-		padding: var(--space-lg);
-		background: var(--bg-elevated);
-		border-left: 3px solid var(--speaking-primary);
-		border-radius: var(--radius-md);
-	}
-
-	.example-label {
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--text-muted);
-		display: block;
-		margin-bottom: var(--space-sm);
-	}
-
-	.example-text {
-		font-style: italic;
-		color: var(--text-secondary);
-		margin: 0;
-	}
-
-	.tips-accordion {
-		margin-top: var(--space-lg);
-	}
-
-	.tips-item {
-		background: var(--bg-elevated);
-		border-radius: var(--radius-md);
-		overflow: hidden;
-	}
-
-	.tips-trigger {
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: var(--space-md) var(--space-lg);
-		background: transparent;
-		border: none;
-		font: inherit;
-		font-weight: 500;
-		color: var(--text-primary);
-		cursor: pointer;
-	}
-	.tips-label {
+	.teil-cta {
+		margin-top: auto;
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-xs);
-	}
-	.tips-icon {
-		width: 1rem;
-		height: 1rem;
-	}
-
-	.trigger-icon {
-		width: 1.1rem;
-		height: 1.1rem;
-		transition: transform var(--transition-fast);
-	}
-
-	:global(.tips-trigger[data-state="open"]) .trigger-icon {
-		transform: rotate(45deg);
-	}
-
-	.tips-content {
-		padding: 0 var(--space-lg) var(--space-lg);
-	}
-
-	.tips-list {
-		margin: 0;
-		padding-left: var(--space-lg);
-		color: var(--text-secondary);
-	}
-
-	.tips-list li {
-		margin-bottom: var(--space-sm);
-	}
-
-	/* === Overview Section === */
-	.overview-section {
-		margin-top: var(--space-2xl);
-		animation: slideUp 0.4s ease forwards;
-	}
-
-	.overview-section h2 {
-		margin-bottom: var(--space-xs);
-	}
-
-	.overview-section > p {
-		color: var(--text-secondary);
-		margin-bottom: var(--space-xl);
-	}
-
-	.overview-timeline {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-lg);
-	}
-
-	.timeline-item {
-		display: flex;
-		gap: var(--space-lg);
-	}
-
-	.timeline-marker {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.marker-num {
-		width: 36px;
-		height: 36px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--speaking-primary);
-		color: white;
-		font-weight: 700;
-		border-radius: 50%;
-	}
-
-	.marker-line {
-		width: 2px;
-		flex: 1;
-		background: var(--border-default);
-		margin-top: var(--space-sm);
-	}
-
-	.timeline-content {
-		flex: 1;
-		padding-bottom: var(--space-lg);
-	}
-
-	.timeline-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: var(--space-sm);
-	}
-
-	.timeline-header h3 {
-		margin: 0;
-		font-size: 1.125rem;
-	}
-
-	.timeline-duration {
-		font-size: 0.875rem;
-		color: var(--text-muted);
-	}
-
-	.timeline-content > p {
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-
-	.timeline-skills {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-xs);
-		margin-top: var(--space-sm);
-	}
-
-	/* === Start Section === */
-	.start-section {
-		margin-top: var(--space-3xl);
-		text-align: center;
-		animation: slideUp 0.5s ease forwards;
-		animation-delay: 0.2s;
-		opacity: 0;
-		animation-fill-mode: forwards;
-	}
-
-	.start-button {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-md);
-		padding: var(--space-lg) var(--space-2xl);
-		background: linear-gradient(135deg, var(--speaking-primary), var(--speaking-secondary));
-		color: #ffffff;
-		font-family: var(--font-body);
-		font-size: 1.125rem;
-		font-weight: 700;
-		border: none;
-		border-radius: var(--radius-xl);
-		cursor: pointer;
-		transition: all var(--transition-normal);
-		box-shadow: 0 8px 32px var(--speaking-glow);
-	}
-
-	.start-button:hover {
-		transform: translateY(-4px) scale(1.02);
-		box-shadow: 0 12px 40px var(--speaking-glow);
-	}
-
-	.start-icon {
-		width: 1.2rem;
-		height: 1.2rem;
-	}
-
-	.start-hint {
-		margin-top: var(--space-md);
-		font-size: 0.875rem;
-		color: var(--text-muted);
-	}
-
-	/* === Dialog === */
-	:global(.dialog-overlay) {
-		position: fixed;
-		inset: 0;
-		background: rgba(15, 23, 42, 0.45);
-		backdrop-filter: blur(4px);
-		z-index: 100;
-		animation: fadeIn 0.2s ease forwards;
-	}
-
-	:global(.dialog-content) {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 90%;
-		max-width: 480px;
-		background: var(--bg-card);
-		border: 1px solid var(--border-default);
-		border-radius: var(--radius-xl);
-		padding: var(--space-xl);
-		z-index: 101;
-		animation: scaleIn 0.3s ease forwards;
-	}
-
-	:global(.dialog-title) {
-		font-family: var(--font-heading);
-		font-size: 1.5rem;
-		margin: 0 0 var(--space-sm);
-	}
-
-	:global(.dialog-description) {
-		color: var(--text-secondary);
-		margin: 0;
-	}
-
-	.dialog-checklist {
-		margin-top: var(--space-lg);
-		padding: var(--space-md);
-		background: var(--bg-elevated);
-		border-radius: var(--radius-md);
-	}
-
-	.dialog-checklist p {
+		gap: 0.35rem;
 		font-weight: 600;
-		color: var(--text-primary);
-		margin: 0 0 var(--space-sm);
+		color: var(--speaking-primary);
 	}
 
-	.dialog-checklist ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	.dialog-checklist li {
-		color: var(--speaking-secondary);
-		padding: var(--space-xs) 0;
-		display: flex;
-		align-items: center;
-		gap: var(--space-xs);
-	}
-	.check-icon {
-		width: 0.95rem;
-		height: 0.95rem;
-		flex-shrink: 0;
-	}
-
-	.dialog-actions {
-		display: flex;
-		gap: var(--space-md);
-		justify-content: flex-end;
+	.level-note {
 		margin-top: var(--space-xl);
+		font-size: 0.88rem;
+		color: var(--text-muted);
 	}
 
-	/* === Responsive === */
+	.level-note a {
+		color: var(--speaking-primary);
+		font-weight: 600;
+	}
+
 	@media (max-width: 768px) {
-		.module-header {
+		.full-test-card {
 			flex-direction: column;
+			align-items: flex-start;
+			padding: var(--space-lg);
 		}
 
-		.header-meta {
-			flex-wrap: wrap;
-		}
-
-		.mode-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.teil-list {
-			flex-direction: column;
-		}
-
-		.timeline-item {
-			flex-direction: column;
-			gap: var(--space-md);
-		}
-
-		.timeline-marker {
-			flex-direction: row;
-		}
-
-		.marker-line {
-			display: none;
+		.full-test-cta {
+			width: 100%;
+			justify-content: center;
 		}
 	}
 </style>
