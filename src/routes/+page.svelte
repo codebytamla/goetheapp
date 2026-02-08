@@ -239,7 +239,10 @@
 						<p>Simulate the real test conditions (approx. 3.5h)</p>
 					</div>
 				</div>
-				<a href="/mock-exam" class="btn btn-secondary btn-sm start-sim-btn">Start Simulation</a>
+				<a href="/mock-exam" class="btn btn-secondary btn-sm start-sim-btn">
+					<span class="cta-play-icon" aria-hidden="true"></span>
+					Start Simulation
+				</a>
 			</section>
 
 			<!-- Modules Grid -->
@@ -539,9 +542,9 @@
 	}
 
 	.dashboard-content {
-		max-width: 1200px;
+		max-width: 1040px;
 		margin: 0 auto;
-		padding: 0 var(--space-lg);
+		padding: 0 var(--space-xl);
 	}
 
 	.dashboard-header {
@@ -658,21 +661,27 @@
 	}
 
 	.start-sim-btn {
-		background: #1f2937;
+		background: #2b303a;
 		color: #ffffff;
-		border-color: #1f2937;
+		border: 2px solid #cbd5e1;
+		border-radius: var(--radius-full);
+		min-height: 46px;
+		padding: 0.65rem 1.1rem;
+		font-weight: 600;
+		white-space: nowrap;
 	}
 
 	.start-sim-btn:hover {
-		background: #111827;
-		border-color: #111827;
+		background: #1f242d;
+		color: #ffffff;
+		border-color: #e2e8f0;
 	}
 
 	/* Modules Grid */
 	.modules-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-		gap: var(--space-lg);
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--space-md);
 	}
 
 	.module-widget {
@@ -717,10 +726,22 @@
 		justify-content: center;
 	}
 
-	.widget-icon.reading { background: color-mix(in srgb, var(--reading-glow) 88%, white); color: var(--reading-primary); }
-	.widget-icon.listening { background: color-mix(in srgb, var(--listening-glow) 88%, white); color: var(--listening-primary); }
-	.widget-icon.writing { background: color-mix(in srgb, var(--writing-glow) 88%, white); color: var(--writing-primary); }
-	.widget-icon.speaking { background: color-mix(in srgb, var(--speaking-glow) 88%, white); color: var(--speaking-primary); }
+	.widget-icon.reading {
+		background: color-mix(in srgb, var(--reading-primary) 12%, white);
+		color: color-mix(in srgb, var(--reading-primary) 72%, #334155);
+	}
+	.widget-icon.listening {
+		background: color-mix(in srgb, var(--listening-primary) 12%, white);
+		color: color-mix(in srgb, var(--listening-primary) 72%, #334155);
+	}
+	.widget-icon.writing {
+		background: color-mix(in srgb, var(--writing-primary) 12%, white);
+		color: color-mix(in srgb, var(--writing-primary) 72%, #334155);
+	}
+	.widget-icon.speaking {
+		background: color-mix(in srgb, var(--speaking-primary) 12%, white);
+		color: color-mix(in srgb, var(--speaking-primary) 72%, #334155);
+	}
 
 	.widget-title {
 		flex: 1;
@@ -741,10 +762,10 @@
 		margin-top: auto;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-start;
 		padding-top: var(--space-md);
 		border-top: 1px solid var(--border-subtle);
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 	}
 
 	.last-session {
@@ -753,15 +774,28 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
+		flex: 1;
+		min-width: 0;
+		white-space: nowrap;
 	}
 
 	.action-btn {
 		font-size: 0.8rem;
 		padding: 0.35rem 0.75rem;
 		gap: 0.25rem;
+		margin-left: auto;
+		flex: 0 0 auto;
 	}
 
 	@media (max-width: 768px) {
+		.dashboard-content {
+			padding: 0 var(--space-md);
+		}
+
+		.modules-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
 		.dashboard-header {
 			flex-direction: column;
 			align-items: flex-start;
@@ -775,6 +809,10 @@
 	}
 
 	@media (max-width: 520px) {
+		.modules-grid {
+			grid-template-columns: 1fr;
+		}
+
 		.widget-footer {
 			flex-wrap: wrap;
 		}

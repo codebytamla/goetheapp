@@ -206,6 +206,14 @@ a {
   /* Consistent radius */
 }
 
+.cta-play-icon {
+  width: 0.52rem;
+  height: 0.64rem;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  flex: 0 0 auto;
+}
+
 /* === Card Styles === */
 .card {
   background: var(--bg-card);

@@ -91,19 +91,22 @@
 			<a href="/" class="back-link">
 				<ArrowLeft size={16} />
 			</a>
-			<span class="level-pill">{data.selectedLevel}</span>
 		</nav>
 
 		<header class="dashboard-header">
 			<div class="header-welcome">
-				<h1>Sprechen</h1>
-				<p>Speaking practice</p>
+				<div class="title-row">
+					<h1>Sprechen</h1>
+					<span class="level-text">{data.selectedLevel}</span>
+				</div>
+				<p>Train each Teil step by step, then take the full simulation when you are ready.</p>
 			</div>
 			<a
 				href="/sprechen/practice?mode=full&level={data.selectedLevel}"
 				class="btn btn-secondary header-full-test-btn"
 			>
-				Start Full Test
+				<span class="cta-play-icon" aria-hidden="true"></span>
+				Full Speaking Test
 			</a>
 		</header>
 
@@ -137,7 +140,7 @@
 								href="/sprechen/practice?mode=teil&teil={teil.id}&level={data.selectedLevel}"
 								class="btn btn-ghost action-btn"
 							>
-								Start {teil.name}
+								Practice {teil.name}
 								<ArrowRight size={16} />
 							</a>
 						</div>
@@ -164,7 +167,7 @@
 	.top-nav {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-start;
 		margin-bottom: var(--space-md);
 	}
 
@@ -181,16 +184,10 @@
 		color: var(--text-primary);
 	}
 
-	.level-pill {
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--speaking-primary);
-		background: var(--speaking-glow);
-		border: 1px solid color-mix(in oklab, var(--speaking-primary) 35%, white);
-		border-radius: var(--radius-full);
-		padding: 0.35rem 0.65rem;
+	.level-text {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--speaking-primary) 78%, #334155);
 	}
 
 	.dashboard-header {
@@ -204,8 +201,16 @@
 
 	.header-welcome h1 {
 		font-size: 2rem;
-		margin: 0 0 0.25rem;
+		margin: 0;
 		color: var(--speaking-primary);
+	}
+
+	.title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-bottom: 0.35rem;
+		flex-wrap: wrap;
 	}
 
 	.header-welcome p {
@@ -214,15 +219,20 @@
 	}
 
 	.header-full-test-btn {
-		background: #1f2937;
-		color: #ffffff;
-		border-color: #1f2937;
+		background: color-mix(in srgb, var(--speaking-primary) 14%, white);
+		color: color-mix(in srgb, var(--speaking-primary) 82%, #0f172a);
+		border: 2px solid var(--speaking-primary);
 		white-space: nowrap;
+		border-radius: var(--radius-full);
+		min-height: 46px;
+		padding: 0.65rem 1.1rem;
+		font-weight: 600;
 	}
 
 	.header-full-test-btn:hover {
-		background: #111827;
-		border-color: #111827;
+		background: color-mix(in srgb, var(--speaking-primary) 20%, white);
+		color: color-mix(in srgb, var(--speaking-primary) 88%, #0f172a);
+		border-color: color-mix(in srgb, var(--speaking-primary) 88%, #0f172a);
 	}
 
 	.section-head {
@@ -285,8 +295,8 @@
 	}
 
 	.widget-icon.speaking {
-		background: color-mix(in srgb, var(--speaking-glow) 88%, white);
-		color: var(--speaking-primary);
+		background: color-mix(in srgb, var(--speaking-primary) 12%, white);
+		color: color-mix(in srgb, var(--speaking-primary) 72%, #334155);
 	}
 
 	.widget-title {
