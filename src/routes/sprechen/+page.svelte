@@ -1,5 +1,17 @@
 <script lang="ts">
 	import { Accordion, Dialog, RadioGroup, Separator, Tabs } from "bits-ui";
+	import {
+		ArrowLeft,
+		Check,
+		ClipboardList,
+		Clock3,
+		Lightbulb,
+		Mic,
+		Play,
+		Plus,
+		Search,
+		Target
+	} from "@lucide/svelte";
 
 	let selectedMode = $state<"full" | "teil">("full");
 	let selectedTeil = $state<string>("teil1");
@@ -77,7 +89,7 @@
 	<!-- Back Navigation -->
 	<nav class="back-nav">
 		<a href="/" class="back-link">
-			<span class="back-icon">←</span>
+			<ArrowLeft class="back-icon" />
 			<span>Back to Dashboard</span>
 		</a>
 	</nav>
@@ -85,7 +97,9 @@
 	<!-- Header -->
 	<header class="module-header">
 		<div class="header-content">
-			<div class="header-icon">🎤</div>
+			<div class="header-icon">
+				<Mic />
+			</div>
 			<div class="header-text">
 				<h1>Sprechen</h1>
 				<p class="header-subtitle">Speaking Module</p>
@@ -93,11 +107,11 @@
 		</div>
 		<div class="header-meta">
 			<span class="meta-badge">
-				<span>⏱️</span>
+				<Clock3 class="badge-icon" />
 				~15 min
 			</span>
 			<span class="meta-badge">
-				<span>📋</span>
+				<ClipboardList class="badge-icon" />
 				3 Teile
 			</span>
 			<span class="meta-badge progress">
@@ -118,20 +132,18 @@
 				<RadioGroup.Item value="full" class="radio-input" />
 				<div class="mode-content">
 					<div class="mode-icon-wrap full">
-						<span class="mode-icon">🎯</span>
+						<Target class="mode-icon" />
 					</div>
 					<div class="mode-details">
 						<h3>Full Speaking Test</h3>
 						<p>Complete all 3 parts in sequence, simulating real exam conditions</p>
 						<div class="mode-info">
-							<span>⏱️ ~15 minutes</span>
-							<span>📋 All 3 Teile</span>
+							<span><Clock3 class="meta-icon" /> ~15 minutes</span>
+							<span><ClipboardList class="meta-icon" /> All 3 Teile</span>
 						</div>
 					</div>
 					<div class="mode-check">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-							<path d="M5 12l5 5L20 7" />
-						</svg>
+						<Check class="mode-check-icon" />
 					</div>
 				</div>
 			</label>
@@ -140,20 +152,18 @@
 				<RadioGroup.Item value="teil" class="radio-input" />
 				<div class="mode-content">
 					<div class="mode-icon-wrap teil">
-						<span class="mode-icon">🔍</span>
+						<Search class="mode-icon" />
 					</div>
 					<div class="mode-details">
 						<h3>Individual Teil</h3>
 						<p>Focus on one specific part for targeted practice and improvement</p>
 						<div class="mode-info">
-							<span>⏱️ 3-4 minutes</span>
-							<span>📋 1 Teil</span>
+							<span><Clock3 class="meta-icon" /> 3-4 minutes</span>
+							<span><ClipboardList class="meta-icon" /> 1 Teil</span>
 						</div>
 					</div>
 					<div class="mode-check">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-							<path d="M5 12l5 5L20 7" />
-						</svg>
+						<Check class="mode-check-icon" />
 					</div>
 				</div>
 			</label>
@@ -184,7 +194,7 @@
 									<span class="teil-badge">{teil.name}</span>
 									<h3>{teil.title}</h3>
 								</div>
-								<span class="teil-duration">⏱️ {teil.duration}</span>
+								<span class="teil-duration"><Clock3 class="meta-icon" /> {teil.duration}</span>
 							</div>
 							
 							<p class="teil-description">{teil.description}</p>
@@ -207,8 +217,8 @@
 								<Accordion.Item value="tips" class="tips-item">
 									<Accordion.Header>
 										<Accordion.Trigger class="tips-trigger">
-											<span>💡 Tips for this Teil</span>
-											<span class="trigger-icon">+</span>
+											<span class="tips-label"><Lightbulb class="tips-icon" /> Tips for this Teil</span>
+											<Plus class="trigger-icon" />
 										</Accordion.Trigger>
 									</Accordion.Header>
 									<Accordion.Content class="tips-content">
@@ -263,7 +273,7 @@
 	<!-- Start Button -->
 	<div class="start-section">
 		<button class="start-button" onclick={startPractice}>
-			<span class="start-icon">▶</span>
+			<Play class="start-icon" />
 			<span>Start {selectedMode === "full" ? "Full Test" : teile.find(t => t.id === selectedTeil)?.name}</span>
 		</button>
 		<p class="start-hint">
@@ -292,9 +302,9 @@
 			<div class="dialog-checklist">
 				<p>Before you begin:</p>
 				<ul>
-					<li>✓ Find a quiet place to speak</li>
-					<li>✓ Make sure your microphone works</li>
-					<li>✓ Prepare to speak clearly in German</li>
+					<li><Check class="check-icon" /> Find a quiet place to speak</li>
+					<li><Check class="check-icon" /> Make sure your microphone works</li>
+					<li><Check class="check-icon" /> Prepare to speak clearly in German</li>
 				</ul>
 			</div>
 			<div class="dialog-actions">
@@ -336,7 +346,8 @@
 	}
 
 	.back-icon {
-		font-size: 1.25rem;
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 
 	/* === Header === */
@@ -355,10 +366,13 @@
 	}
 
 	.header-icon {
-		font-size: 4rem;
 		padding: var(--space-lg);
 		background: var(--speaking-glow);
 		border-radius: var(--radius-xl);
+	}
+	.header-icon :global(svg) {
+		width: 3rem;
+		height: 3rem;
 	}
 
 	.header-text h1 {
@@ -388,6 +402,10 @@
 		border-radius: var(--radius-full);
 		font-size: 0.875rem;
 		color: var(--text-secondary);
+	}
+	.badge-icon {
+		width: 0.95rem;
+		height: 0.95rem;
 	}
 
 	.meta-badge.progress {
@@ -467,7 +485,10 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: var(--radius-lg);
-		font-size: 1.75rem;
+	}
+	.mode-icon {
+		width: 1.6rem;
+		height: 1.6rem;
 	}
 
 	.mode-icon-wrap.full {
@@ -496,6 +517,11 @@
 		font-size: 0.8rem;
 		color: var(--text-muted);
 	}
+	.mode-info span {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+	}
 
 	.mode-check {
 		position: absolute;
@@ -521,7 +547,7 @@
 		color: white;
 	}
 
-	.mode-check svg {
+	.mode-check-icon {
 		width: 14px;
 		height: 14px;
 	}
@@ -632,6 +658,9 @@
 		border-radius: var(--radius-full);
 		font-size: 0.875rem;
 		color: var(--text-secondary);
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
 	}
 
 	.teil-description {
@@ -717,10 +746,19 @@
 		color: var(--text-primary);
 		cursor: pointer;
 	}
+	.tips-label {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+	}
+	.tips-icon {
+		width: 1rem;
+		height: 1rem;
+	}
 
 	.trigger-icon {
-		font-size: 1.25rem;
-		font-weight: 300;
+		width: 1.1rem;
+		height: 1.1rem;
 		transition: transform var(--transition-fast);
 	}
 
@@ -860,7 +898,8 @@
 	}
 
 	.start-icon {
-		font-size: 1.25rem;
+		width: 1.2rem;
+		height: 1.2rem;
 	}
 
 	.start-hint {
@@ -927,6 +966,14 @@
 	.dialog-checklist li {
 		color: var(--speaking-secondary);
 		padding: var(--space-xs) 0;
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+	}
+	.check-icon {
+		width: 0.95rem;
+		height: 0.95rem;
+		flex-shrink: 0;
 	}
 
 	.dialog-actions {

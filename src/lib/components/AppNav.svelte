@@ -37,7 +37,7 @@
 			<div class="nav-logo-circle">
 				<Bird size={20} aria-hidden="true" />
 			</div>
-			<span class="nav-title">Goethe Sim</span>
+			<span class="nav-title">Amsel</span>
 		</div>
 		<button
 			type="button"

@@ -1,5 +1,12 @@
 <script lang="ts">
 	import { Separator, Tabs } from "bits-ui";
+	import {
+		ArrowLeft,
+		ArrowRight,
+		ClipboardList,
+		Clock3,
+		Headphones
+	} from "@lucide/svelte";
 
 	const teile = [
 		{
@@ -50,22 +57,24 @@
 <div class="page-container">
 	<nav class="back-nav">
 		<a href="/" class="back-link">
-			<span class="back-icon">←</span>
+			<ArrowLeft class="back-icon" />
 			<span>Back to Dashboard</span>
 		</a>
 	</nav>
 
 	<header class="module-header">
 		<div class="header-content">
-			<div class="header-icon">🎧</div>
+			<div class="header-icon">
+				<Headphones />
+			</div>
 			<div class="header-text">
 				<h1>Hören</h1>
 				<p class="header-subtitle">Listening Module</p>
 			</div>
 		</div>
 		<div class="header-meta">
-			<span class="meta-badge"><span>⏱️</span> 40 min</span>
-			<span class="meta-badge"><span>📋</span> 4 Teile</span>
+			<span class="meta-badge"><Clock3 class="badge-icon" /> 40 min</span>
+			<span class="meta-badge"><ClipboardList class="badge-icon" /> 4 Teile</span>
 			<span class="meta-badge progress">68% mastery</span>
 		</div>
 	</header>
@@ -94,8 +103,8 @@
 								<h3>{teil.title}</h3>
 							</div>
 							<div class="teil-meta">
-								<span>⏱️ {teil.duration}</span>
-								<span>📋 {teil.tasks}</span>
+								<span><Clock3 class="meta-icon" /> {teil.duration}</span>
+								<span><ClipboardList class="meta-icon" /> {teil.tasks}</span>
 							</div>
 						</div>
 						<p class="teil-description">{teil.description}</p>
@@ -106,7 +115,7 @@
 						</div>
 						<a href="/hoeren/practice?teil={teil.id}" class="teil-cta">
 							Start {teil.name}
-							<span>→</span>
+							<ArrowRight class="cta-icon" />
 						</a>
 					</div>
 				</Tabs.Content>
@@ -117,7 +126,7 @@
 	<section class="full-test-section">
 		<div class="full-test-card">
 			<div>
-				<h3>🎧 Full Listening Test</h3>
+				<h3><Headphones class="title-icon" /> Full Listening Test</h3>
 				<p>Complete all 4 Teile under exam conditions</p>
 			</div>
 			<a href="/hoeren/practice?mode=full" class="btn btn-primary">Start Full Test</a>
@@ -141,7 +150,7 @@
 		border-radius: var(--radius-md); transition: all var(--transition-fast);
 	}
 	.back-link:hover { color: var(--text-primary); background: var(--bg-card); }
-	.back-icon { font-size: 1.25rem; }
+	.back-icon { width: 1.25rem; height: 1.25rem; }
 
 	.module-header {
 		display: flex; justify-content: space-between; align-items: flex-start;
@@ -149,9 +158,10 @@
 	}
 	.header-content { display: flex; align-items: center; gap: var(--space-lg); }
 	.header-icon {
-		font-size: 4rem; padding: var(--space-lg);
+		padding: var(--space-lg);
 		background: var(--listening-glow); border-radius: var(--radius-xl);
 	}
+	.header-icon :global(svg) { width: 3rem; height: 3rem; }
 	.header-text h1 { font-size: 2.5rem; color: var(--listening-primary); margin: 0; }
 	.header-subtitle { font-size: 1.125rem; color: var(--text-secondary); margin: var(--space-xs) 0 0; }
 	.header-meta { display: flex; gap: var(--space-sm); }
@@ -161,6 +171,7 @@
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-full); font-size: 0.875rem; color: var(--text-secondary);
 	}
+	.badge-icon { width: 0.95rem; height: 0.95rem; }
 	.meta-badge.progress { background: var(--listening-glow); border-color: var(--listening-primary); color: var(--listening-secondary); }
 
 	.section-divider { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
@@ -198,6 +209,8 @@
 	}
 	.teil-header h3 { margin: 0; font-size: 1.5rem; }
 	.teil-meta { display: flex; gap: var(--space-md); font-size: 0.875rem; color: var(--text-muted); }
+	.teil-meta span { display: inline-flex; align-items: center; gap: var(--space-xs); }
+	.meta-icon { width: 0.9rem; height: 0.9rem; }
 	.teil-description { color: var(--text-secondary); line-height: 1.6; }
 	.teil-skills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-lg); }
 	.skill-chip {
@@ -212,6 +225,7 @@
 		border-radius: var(--radius-md); font-weight: 600;
 		transition: all var(--transition-fast);
 	}
+	.cta-icon { width: 1rem; height: 1rem; }
 	.teil-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--listening-glow); }
 
 	.full-test-section { margin-top: var(--space-2xl); }
@@ -220,7 +234,8 @@
 		padding: var(--space-xl); background: var(--bg-card);
 		border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
 	}
-	.full-test-card h3 { margin: 0; }
+	.full-test-card h3 { margin: 0; display: flex; align-items: center; gap: var(--space-sm); }
+	.title-icon { width: 1.2rem; height: 1.2rem; }
 	.full-test-card p { margin: var(--space-xs) 0 0; color: var(--text-secondary); }
 
 	@media (max-width: 768px) {
