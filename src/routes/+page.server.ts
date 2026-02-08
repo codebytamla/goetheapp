@@ -46,14 +46,18 @@ export const load: PageServerLoad = async (event) => {
 		let selectedLevel: CefrLevel = DEFAULT_CEFR_LEVEL;
 
 		if (session?.user?.id) {
-			const [preference] = await db
-				.select({ cefrLevel: userPreference.cefrLevel })
-				.from(userPreference)
-				.where(eq(userPreference.userId, session.user.id))
-				.limit(1);
+			try {
+				const [preference] = await db
+					.select({ cefrLevel: userPreference.cefrLevel })
+					.from(userPreference)
+					.where(eq(userPreference.userId, session.user.id))
+					.limit(1);
 
-			if (preference?.cefrLevel && isCefrLevel(preference.cefrLevel)) {
-				selectedLevel = preference.cefrLevel;
+				if (preference?.cefrLevel && isCefrLevel(preference.cefrLevel)) {
+					selectedLevel = preference.cefrLevel;
+				}
+			} catch (error) {
+				console.error("[home] Failed to load user preferences", error);
 			}
 		}
 
@@ -158,21 +162,30 @@ export const actions: Actions = {
 		const db = drizzle(env.DB);
 		const now = new Date();
 
-		await db
-			.insert(userPreference)
-			.values({
-				userId: session.user.id,
-				cefrLevel: level,
-				createdAt: now,
-				updatedAt: now
-			})
-			.onConflictDoUpdate({
-				target: userPreference.userId,
-				set: {
+		try {
+			await db
+				.insert(userPreference)
+				.values({
+					userId: session.user.id,
 					cefrLevel: level,
+					createdAt: now,
 					updatedAt: now
-				}
+				})
+				.onConflictDoUpdate({
+					target: userPreference.userId,
+					set: {
+						cefrLevel: level,
+						updatedAt: now
+					}
+				});
+		} catch (error) {
+			console.error("[home] Failed to update user preferences", error);
+			return fail(500, {
+				levelStatus: "error",
+				levelMessage:
+					"Could not save your level. The user_preference migration may be missing."
 			});
+		}
 
 		return {
 			levelStatus: "success",

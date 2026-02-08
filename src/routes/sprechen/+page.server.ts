@@ -30,14 +30,18 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	const db = drizzle(env.DB);
-	const [preference] = await db
-		.select({ cefrLevel: userPreference.cefrLevel })
-		.from(userPreference)
-		.where(eq(userPreference.userId, session.user.id))
-		.limit(1);
+	try {
+		const [preference] = await db
+			.select({ cefrLevel: userPreference.cefrLevel })
+			.from(userPreference)
+			.where(eq(userPreference.userId, session.user.id))
+			.limit(1);
 
-	if (preference?.cefrLevel && isCefrLevel(preference.cefrLevel)) {
-		return { selectedLevel: preference.cefrLevel };
+		if (preference?.cefrLevel && isCefrLevel(preference.cefrLevel)) {
+			return { selectedLevel: preference.cefrLevel };
+		}
+	} catch (error) {
+		console.error("[sprechen] Failed to load user preferences", error);
 	}
 
 	return { selectedLevel: DEFAULT_CEFR_LEVEL };
