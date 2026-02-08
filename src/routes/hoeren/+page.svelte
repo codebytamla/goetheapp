@@ -57,7 +57,7 @@
 <div class="page-container">
 	<nav class="back-nav">
 		<a href="/" class="back-link">
-			<ArrowLeft class="back-icon" />
+			<ArrowLeft size={20} />
 			<span>Back to Dashboard</span>
 		</a>
 	</nav>
@@ -73,8 +73,8 @@
 			</div>
 		</div>
 		<div class="header-meta">
-			<span class="meta-badge"><Clock3 class="badge-icon" /> 40 min</span>
-			<span class="meta-badge"><ClipboardList class="badge-icon" /> 4 Teile</span>
+			<span class="meta-badge"><Clock3 size={15} /> 40 min</span>
+			<span class="meta-badge"><ClipboardList size={15} /> 4 Teile</span>
 			<span class="meta-badge progress">68% mastery</span>
 		</div>
 	</header>
@@ -103,8 +103,8 @@
 								<h3>{teil.title}</h3>
 							</div>
 							<div class="teil-meta">
-								<span><Clock3 class="meta-icon" /> {teil.duration}</span>
-								<span><ClipboardList class="meta-icon" /> {teil.tasks}</span>
+								<span><Clock3 size={14} /> {teil.duration}</span>
+								<span><ClipboardList size={14} /> {teil.tasks}</span>
 							</div>
 						</div>
 						<p class="teil-description">{teil.description}</p>
@@ -115,7 +115,7 @@
 						</div>
 						<a href="/hoeren/practice?teil={teil.id}" class="teil-cta">
 							Start {teil.name}
-							<ArrowRight class="cta-icon" />
+							<ArrowRight size={16} />
 						</a>
 					</div>
 				</Tabs.Content>
@@ -126,7 +126,7 @@
 	<section class="full-test-section">
 		<div class="full-test-card">
 			<div>
-				<h3><Headphones class="title-icon" /> Full Listening Test</h3>
+				<h3><Headphones size={18} /> Full Listening Test</h3>
 				<p>Complete all 4 Teile under exam conditions</p>
 			</div>
 			<a href="/hoeren/practice?mode=full" class="btn btn-primary">Start Full Test</a>
@@ -150,7 +150,6 @@
 		border-radius: var(--radius-md); transition: all var(--transition-fast);
 	}
 	.back-link:hover { color: var(--text-primary); background: var(--bg-card); }
-	.back-icon { width: 1.25rem; height: 1.25rem; }
 
 	.module-header {
 		display: flex; justify-content: space-between; align-items: flex-start;
@@ -171,30 +170,29 @@
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-full); font-size: 0.875rem; color: var(--text-secondary);
 	}
-	.badge-icon { width: 0.95rem; height: 0.95rem; }
 	.meta-badge.progress { background: var(--listening-glow); border-color: var(--listening-primary); color: var(--listening-secondary); }
 
-	.section-divider { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
+	:global(.section-divider) { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
 
 	.teile-section { animation: slideUp 0.5s ease forwards; }
 	.teile-section h2 { margin-bottom: var(--space-xs); }
 	.teile-section > p { color: var(--text-secondary); margin-bottom: var(--space-xl); }
 
-	.teile-list {
+	:global(.teile-list) {
 		display: flex; gap: var(--space-sm); padding: var(--space-sm);
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-lg); margin-bottom: var(--space-lg);
 	}
-	.teil-trigger {
+	:global(.teil-trigger) {
 		flex: 1; padding: var(--space-md);
 		background: transparent; border: none; border-radius: var(--radius-md);
 		cursor: pointer; transition: all var(--transition-fast);
 		font-weight: 600; color: var(--text-secondary);
 	}
-	.teil-trigger:hover { background: var(--bg-elevated); color: var(--text-primary); }
+	:global(.teil-trigger:hover) { background: var(--bg-elevated); color: var(--text-primary); }
 	:global(.teil-trigger[data-state="active"]) { background: var(--listening-glow); color: var(--listening-primary); }
 
-	.teil-content { animation: scaleIn 0.3s ease forwards; }
+	:global(.teil-content) { animation: scaleIn 0.3s ease forwards; }
 	.teil-card {
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-xl); padding: var(--space-xl);
@@ -210,7 +208,6 @@
 	.teil-header h3 { margin: 0; font-size: 1.5rem; }
 	.teil-meta { display: flex; gap: var(--space-md); font-size: 0.875rem; color: var(--text-muted); }
 	.teil-meta span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-	.meta-icon { width: 0.9rem; height: 0.9rem; }
 	.teil-description { color: var(--text-secondary); line-height: 1.6; }
 	.teil-skills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-lg); }
 	.skill-chip {
@@ -225,7 +222,6 @@
 		border-radius: var(--radius-md); font-weight: 600;
 		transition: all var(--transition-fast);
 	}
-	.cta-icon { width: 1rem; height: 1rem; }
 	.teil-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--listening-glow); }
 
 	.full-test-section { margin-top: var(--space-2xl); }
@@ -235,13 +231,12 @@
 		border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
 	}
 	.full-test-card h3 { margin: 0; display: flex; align-items: center; gap: var(--space-sm); }
-	.title-icon { width: 1.2rem; height: 1.2rem; }
 	.full-test-card p { margin: var(--space-xs) 0 0; color: var(--text-secondary); }
 
 	@media (max-width: 768px) {
 		.module-header { flex-direction: column; }
 		.header-meta { flex-wrap: wrap; }
-		.teile-list { flex-wrap: wrap; }
+		:global(.teile-list) { flex-wrap: wrap; }
 		.full-test-card { flex-direction: column; text-align: center; }
 	}
 </style>

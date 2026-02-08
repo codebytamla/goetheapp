@@ -41,7 +41,7 @@
 <div class="page-container">
 	<nav class="back-nav">
 		<a href="/" class="back-link">
-			<ArrowLeft class="back-icon" />
+			<ArrowLeft size={20} />
 			<span>Back to Dashboard</span>
 		</a>
 	</nav>
@@ -57,8 +57,8 @@
 			</div>
 		</div>
 		<div class="header-meta">
-			<span class="meta-badge"><Clock3 class="badge-icon" /> 60 min</span>
-			<span class="meta-badge"><ClipboardList class="badge-icon" /> 2 Teile</span>
+			<span class="meta-badge"><Clock3 size={15} /> 60 min</span>
+			<span class="meta-badge"><ClipboardList size={15} /> 2 Teile</span>
 			<span class="meta-badge progress">64% mastery</span>
 		</div>
 	</header>
@@ -87,8 +87,8 @@
 								<h3>{teil.title}</h3>
 							</div>
 							<div class="teil-meta">
-								<span><Clock3 class="meta-icon" /> {teil.duration}</span>
-								<span><FileText class="meta-icon" /> {teil.wordCount}</span>
+								<span><Clock3 size={14} /> {teil.duration}</span>
+								<span><FileText size={14} /> {teil.wordCount}</span>
 							</div>
 						</div>
 						<p class="teil-description">{teil.description}</p>
@@ -99,7 +99,7 @@
 						</div>
 
 						<div class="writing-tips">
-							<h4><Lightbulb class="tips-icon" /> Key Points for Success</h4>
+							<h4><Lightbulb size={16} /> Key Points for Success</h4>
 							<ul>
 								<li>Address all required points in the task</li>
 								<li>Use appropriate connectors (außerdem, deshalb, trotzdem)</li>
@@ -110,7 +110,7 @@
 
 						<a href="/schreiben/practice?teil={teil.id}" class="teil-cta">
 							Start {teil.name}
-							<ArrowRight class="cta-icon" />
+							<ArrowRight size={16} />
 						</a>
 					</div>
 				</Tabs.Content>
@@ -121,7 +121,7 @@
 	<section class="full-test-section">
 		<div class="full-test-card">
 			<div>
-				<h3><PenTool class="title-icon" /> Full Writing Test</h3>
+				<h3><PenTool size={18} /> Full Writing Test</h3>
 				<p>Complete both Teile under exam conditions</p>
 			</div>
 			<a href="/schreiben/practice?mode=full" class="btn btn-primary">Start Full Test</a>
@@ -145,7 +145,6 @@
 		border-radius: var(--radius-md); transition: all var(--transition-fast);
 	}
 	.back-link:hover { color: var(--text-primary); background: var(--bg-card); }
-	.back-icon { width: 1.25rem; height: 1.25rem; }
 
 	.module-header {
 		display: flex; justify-content: space-between; align-items: flex-start;
@@ -166,30 +165,29 @@
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-full); font-size: 0.875rem; color: var(--text-secondary);
 	}
-	.badge-icon { width: 0.95rem; height: 0.95rem; }
 	.meta-badge.progress { background: var(--writing-glow); border-color: var(--writing-primary); color: var(--writing-secondary); }
 
-	.section-divider { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
+	:global(.section-divider) { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
 
 	.teile-section { animation: slideUp 0.5s ease forwards; }
 	.teile-section h2 { margin-bottom: var(--space-xs); }
 	.teile-section > p { color: var(--text-secondary); margin-bottom: var(--space-xl); }
 
-	.teile-list {
+	:global(.teile-list) {
 		display: flex; gap: var(--space-sm); padding: var(--space-sm);
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-lg); margin-bottom: var(--space-lg);
 	}
-	.teil-trigger {
+	:global(.teil-trigger) {
 		flex: 1; padding: var(--space-md);
 		background: transparent; border: none; border-radius: var(--radius-md);
 		cursor: pointer; transition: all var(--transition-fast);
 		font-weight: 600; color: var(--text-secondary);
 	}
-	.teil-trigger:hover { background: var(--bg-elevated); color: var(--text-primary); }
+	:global(.teil-trigger:hover) { background: var(--bg-elevated); color: var(--text-primary); }
 	:global(.teil-trigger[data-state="active"]) { background: var(--writing-glow); color: var(--writing-primary); }
 
-	.teil-content { animation: scaleIn 0.3s ease forwards; }
+	:global(.teil-content) { animation: scaleIn 0.3s ease forwards; }
 	.teil-card {
 		background: var(--bg-card); border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-xl); padding: var(--space-xl);
@@ -205,7 +203,6 @@
 	.teil-header h3 { margin: 0; font-size: 1.5rem; }
 	.teil-meta { display: flex; gap: var(--space-md); font-size: 0.875rem; color: var(--text-muted); }
 	.teil-meta span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-	.meta-icon { width: 0.9rem; height: 0.9rem; }
 	.teil-description { color: var(--text-secondary); line-height: 1.6; }
 	.teil-skills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-lg); }
 	.skill-chip {
@@ -222,7 +219,6 @@
 		border-left: 3px solid var(--writing-primary);
 	}
 	.writing-tips h4 { margin: 0 0 var(--space-md); font-size: 1rem; display: flex; align-items: center; gap: var(--space-xs); }
-	.tips-icon { width: 1rem; height: 1rem; }
 	.writing-tips ul { margin: 0; padding-left: var(--space-lg); color: var(--text-secondary); }
 	.writing-tips li { margin-bottom: var(--space-sm); }
 
@@ -233,7 +229,6 @@
 		border-radius: var(--radius-md); font-weight: 600;
 		transition: all var(--transition-fast);
 	}
-	.cta-icon { width: 1rem; height: 1rem; }
 	.teil-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--writing-glow); }
 
 	.full-test-section { margin-top: var(--space-2xl); }
@@ -243,13 +238,12 @@
 		border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
 	}
 	.full-test-card h3 { margin: 0; display: flex; align-items: center; gap: var(--space-sm); }
-	.title-icon { width: 1.2rem; height: 1.2rem; }
 	.full-test-card p { margin: var(--space-xs) 0 0; color: var(--text-secondary); }
 
 	@media (max-width: 768px) {
 		.module-header { flex-direction: column; }
 		.header-meta { flex-wrap: wrap; }
-		.teile-list { flex-wrap: wrap; }
+		:global(.teile-list) { flex-wrap: wrap; }
 		.full-test-card { flex-direction: column; text-align: center; }
 	}
 </style>

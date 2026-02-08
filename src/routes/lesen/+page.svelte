@@ -1,60 +1,210 @@
 <script lang="ts">
-	import { ArrowLeft, ArrowRight, BookOpen, Clock3 } from "@lucide/svelte";
+	import { ArrowLeft, ArrowRight, BookOpen, ClipboardList } from "@lucide/svelte";
 	import type { PageData } from "./$types";
+
+	type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 	type ReadingTeil = {
 		id: string;
 		name: string;
 		title: string;
-		duration: string;
-		tasks: string;
+		format: string;
 		description: string;
+	};
+
+	type ReadingConfig = {
+		teile: ReadingTeil[];
 	};
 
 	let { data }: { data: PageData } = $props();
 
-	const teile: ReadingTeil[] = [
-		{
-			id: "teil1",
-			name: "Teil 1",
-			title: "Korrespondenz",
-			duration: "10 min",
-			tasks: "6 items",
-			description: "Read short practical messages and pick the best answer for each situation."
+	const levelConfigs: Record<CefrLevel, ReadingConfig> = {
+		A1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short notices / signs",
+					format: "Match text to situation",
+					description: "Match short notices or signs to the correct everyday situation."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Short messages / ads",
+					format: "True / false",
+					description: "Read short messages or ads and decide whether statements are true or false."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Simple email or note",
+					format: "Choose correct answers",
+					description: "Read a simple email or note and select the correct answers."
+				}
+			]
 		},
-		{
-			id: "teil2",
-			name: "Teil 2",
-			title: "Presse",
-			duration: "20 min",
-			tasks: "6 items",
-			description: "Work through a longer article and match statements with the right sections."
+		A2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short everyday texts",
+					format: "Matching",
+					description: "Match short everyday texts such as ads and notices to the right prompts."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Emails / short articles",
+					format: "Multiple choice",
+					description: "Read emails or short articles and answer multiple-choice questions."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Longer practical text",
+					format: "True / false",
+					description: "Work through a longer practical text and mark statements true or false."
+				}
+			]
 		},
-		{
-			id: "teil3",
-			name: "Teil 3",
-			title: "Alltagssituationen",
-			duration: "10 min",
-			tasks: "7 items",
-			description: "Read short everyday texts and decide if each statement is true or false."
+		B1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short texts",
+					format: "Matching",
+					description: "Read announcements or emails and match information to the right prompt."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Informational texts",
+					format: "Multiple choice",
+					description: "Answer multiple-choice questions based on informational texts."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Opinions / blogs",
+					format: "True / false",
+					description: "Evaluate opinion texts or blogs and decide whether statements are true or false."
+				},
+				{
+					id: "teil4",
+					name: "Teil 4",
+					title: "One longer text",
+					format: "Detailed comprehension",
+					description: "Read one longer text carefully and answer detail-focused questions."
+				}
+			]
 		},
-		{
-			id: "teil4",
-			name: "Teil 4",
-			title: "Meinungen",
-			duration: "15 min",
-			tasks: "6 items",
-			description: "Compare opinions from multiple speakers and match each viewpoint correctly."
+		B2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short texts",
+					format: "Match headings",
+					description: "Match headings to short texts by identifying the central idea."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Articles / reports",
+					format: "Multiple choice",
+					description: "Read articles or reports and answer targeted multiple-choice items."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "One complex text",
+					format: "Detailed questions",
+					description: "Process one complex text and answer detailed comprehension questions."
+				},
+				{
+					id: "teil4",
+					name: "Teil 4",
+					title: "Gapped text",
+					format: "Choose correct sentences",
+					description: "Fill a gapped text by selecting the most suitable missing sentences."
+				}
+			]
 		},
-		{
-			id: "teil5",
-			name: "Teil 5",
-			title: "Formelle Korrespondenz",
-			duration: "10 min",
-			tasks: "5 items",
-			description: "Complete a formal text by choosing the best word or phrase in each gap."
+		C1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short texts",
+					format: "Match statements",
+					description: "Match nuanced statements to short texts with careful attention to meaning."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Long factual text",
+					format: "Multiple choice",
+					description: "Answer multiple-choice questions on a long factual text."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Opinion / argumentative text",
+					format: "Deep comprehension",
+					description: "Analyze argumentative writing and respond to deeper comprehension tasks."
+				},
+				{
+					id: "teil4",
+					name: "Teil 4",
+					title: "Gapped text",
+					format: "Sentence insertion",
+					description: "Insert missing sentences into a gapped text while preserving coherence."
+				}
+			]
+		},
+		C2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short complex texts",
+					format: "Match meaning",
+					description: "Match subtle meaning in short complex texts with high precision."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Long abstract text",
+					format: "Detailed analysis",
+					description: "Perform detailed analysis on a long abstract text."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Highly complex text",
+					format: "Inference and nuance",
+					description: "Interpret inference, tone, and nuance in highly complex writing."
+				},
+				{
+					id: "teil4",
+					name: "Teil 4",
+					title: "Gapped text",
+					format: "Advanced sentence matching",
+					description: "Complete a gapped text using advanced sentence matching."
+				}
+			]
 		}
-	];
+	};
+
+	const getLevelConfig = (level: string): ReadingConfig => {
+		const typedLevel = level as CefrLevel;
+		return levelConfigs[typedLevel] ?? levelConfigs.B1;
+	};
+
+	let levelConfig = $derived(getLevelConfig(data.selectedLevel));
 </script>
 
 <svelte:head>
@@ -76,7 +226,7 @@
 					<h1>Lesen</h1>
 					<span class="level-text">{data.selectedLevel}</span>
 				</div>
-				<p>Build reading accuracy Teil by Teil, then run the full simulation in one sitting.</p>
+				<p>Each level has a different reading format. Practice by Teil, then run the full test.</p>
 			</div>
 			<a
 				href="/lesen/practice?mode=full&level={data.selectedLevel}"
@@ -93,7 +243,7 @@
 			</div>
 
 			<div class="modules-grid">
-				{#each teile as teil}
+				{#each levelConfig.teile as teil}
 					<article class="module-widget">
 						<div class="widget-header">
 							<div class="widget-header-main">
@@ -110,8 +260,8 @@
 
 						<div class="widget-footer">
 							<span class="last-session">
-								<Clock3 size={14} />
-								{teil.duration} - {teil.tasks}
+								<ClipboardList size={14} />
+								{teil.format}
 							</span>
 							<a
 								href="/lesen/practice?mode=teil&teil={teil.id}&level={data.selectedLevel}"
