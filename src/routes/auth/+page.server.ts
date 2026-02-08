@@ -22,9 +22,11 @@ export const load: PageServerLoad = async (event) => {
 		};
 	}
 
+	const env = event.platform.env as AuthEnv;
+	const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+
 	try {
-		const env = event.platform.env as AuthEnv;
-		const auth = createAuth(event.platform.env as AuthEnv, event.url.origin);
+		const auth = createAuth(env, event.url.origin);
 		const session = await auth.api.getSession({
 			headers: event.request.headers
 		});
@@ -33,7 +35,7 @@ export const load: PageServerLoad = async (event) => {
 			user: session?.user ?? null,
 			session: session?.session ?? null,
 			authError: event.url.searchParams.get("error"),
-			googleEnabled: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
+			googleEnabled
 		};
 	} catch (err) {
 		console.error("[auth] getSession failed", err);
@@ -41,7 +43,7 @@ export const load: PageServerLoad = async (event) => {
 			user: null,
 			session: null,
 			authError: asMessage(err),
-			googleEnabled: false
+			googleEnabled
 		};
 	}
 };

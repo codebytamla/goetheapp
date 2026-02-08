@@ -34,8 +34,10 @@ export const load: PageServerLoad = async (event) => {
 		};
 	}
 
+	const env = event.platform.env as AuthEnv;
+	const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+
 	try {
-		const env = event.platform.env as AuthEnv;
 		const auth = createAuth(env, event.url.origin);
 		const session = await auth.api.getSession({
 			headers: event.request.headers
@@ -59,7 +61,7 @@ export const load: PageServerLoad = async (event) => {
 			isAuthenticated: Boolean(session?.user),
 			user: session?.user ?? null,
 			session: session?.session ?? null,
-			googleEnabled: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+			googleEnabled,
 			selectedLevel
 		};
 	} catch (error) {
@@ -68,7 +70,7 @@ export const load: PageServerLoad = async (event) => {
 			isAuthenticated: false,
 			user: null,
 			session: null,
-			googleEnabled: false,
+			googleEnabled,
 			selectedLevel: DEFAULT_CEFR_LEVEL
 		};
 	}
