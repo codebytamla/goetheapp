@@ -1,242 +1,495 @@
 <script lang="ts">
-	import { Separator, Tabs } from "bits-ui";
-	import {
-		ArrowLeft,
-		ArrowRight,
-		ClipboardList,
-		Clock3,
-		Headphones
-	} from "@lucide/svelte";
+	import { ArrowLeft, ArrowRight, Headphones, Timer } from "@lucide/svelte";
+	import type { PageData } from "./$types";
 
-	const teile = [
-		{
-			id: "teil1",
-			name: "Teil 1",
-			title: "Ansagen",
-			description: "Listen to short announcements and match them to the correct statements or images.",
-			duration: "8 min",
-			tasks: "6 items",
-			skills: ["Key information extraction", "Quick comprehension"]
+	type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+
+	type ListeningTeil = {
+		id: string;
+		name: string;
+		title: string;
+		listenRule: string;
+		description: string;
+	};
+
+	type ListeningConfig = {
+		teile: ListeningTeil[];
+	};
+
+	let { data }: { data: PageData } = $props();
+
+	const levelConfigs: Record<CefrLevel, ListeningConfig> = {
+		A1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short announcements / dialogues",
+					listenRule: "One listen",
+					description: "Identify key details from short announcements and mini-dialogues."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Simple conversations",
+					listenRule: "Two listens",
+					description: "Follow simple conversations and answer with better accuracy across two plays."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Short messages",
+					listenRule: "One listen",
+					description: "Understand short spoken messages in one pass."
+				}
+			]
 		},
-		{
-			id: "teil2",
-			name: "Teil 2",
-			title: "Radiosendung",
-			description: "Listen to a radio broadcast and answer multiple choice questions.",
-			duration: "15 min",
-			tasks: "6 items",
-			skills: ["Main ideas", "Speaker intentions"]
+		A2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Everyday conversations",
+					listenRule: "One listen",
+					description: "Track practical everyday exchanges and choose the best response."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Announcements / info",
+					listenRule: "Two listens",
+					description: "Extract concrete details from announcements and informational audio."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Longer dialogue",
+					listenRule: "One or two listens",
+					description: "Follow a longer dialogue and handle connected meaning across turns."
+				}
+			]
 		},
-		{
-			id: "teil3",
-			name: "Teil 3",
-			title: "Alltagsgespräch",
-			description: "Listen to an everyday conversation and identify true/false statements.",
-			duration: "10 min",
-			tasks: "6 items",
-			skills: ["Detail recognition", "Context understanding"]
+		B1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short conversations",
+					listenRule: "One listen",
+					description: "Understand short exchanges and capture core intent quickly."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Interviews / reports",
+					listenRule: "Two listens",
+					description: "Work through interview or report content with two listens for precision."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Longer talk",
+					listenRule: "One listen",
+					description: "Process one longer talk and answer while information flows."
+				}
+			]
 		},
-		{
-			id: "teil4",
-			name: "Teil 4",
-			title: "Interview",
-			description: "Listen to an interview and match statements to what each person says.",
-			duration: "12 min",
-			tasks: "6 items",
-			skills: ["Speaker identification", "Opinion recognition"]
+		B2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Short texts",
+					listenRule: "One listen",
+					description: "Handle compact listening texts with fast comprehension."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Interviews / discussions",
+					listenRule: "Two listens",
+					description: "Analyze viewpoints in interviews and discussions with two listens."
+				},
+				{
+					id: "teil3",
+					name: "Teil 3",
+					title: "Lecture or report",
+					listenRule: "One listen",
+					description: "Follow a structured lecture or report in one full run."
+				}
+			]
+		},
+		C1: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Interviews / discussions",
+					listenRule: "Two listens",
+					description: "Evaluate nuanced positions and speaker intent in advanced discussions."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Long lecture / report",
+					listenRule: "One listen",
+					description: "Maintain concentration through longer expert-level input."
+				}
+			]
+		},
+		C2: {
+			teile: [
+				{
+					id: "teil1",
+					name: "Teil 1",
+					title: "Complex discussions",
+					listenRule: "Two listens",
+					description: "Track subtle argumentation and stance in complex multi-speaker audio."
+				},
+				{
+					id: "teil2",
+					name: "Teil 2",
+					title: "Long abstract lecture",
+					listenRule: "One listen",
+					description: "Interpret abstract high-density content in a single run."
+				}
+			]
 		}
-	];
+	};
 
-	let selectedTeil = $state("teil1");
+	const getLevelConfig = (level: string): ListeningConfig => {
+		const typedLevel = level as CefrLevel;
+		return levelConfigs[typedLevel] ?? levelConfigs.B1;
+	};
+
+	let levelConfig = $derived(getLevelConfig(data.selectedLevel));
 </script>
 
 <svelte:head>
 	<title>Hören | Goethe Prüfung Practice</title>
+	<meta name="description" content="Practice the listening module for your Goethe exam." />
 </svelte:head>
 
-<div class="page-container">
-	<nav class="back-nav">
-		<a href="/" class="back-link">
-			<ArrowLeft size={20} />
-			<span>Back to Dashboard</span>
-		</a>
-	</nav>
+<div class="app-shell">
+	<main class="dashboard-content">
+		<nav class="top-nav">
+			<a href="/" class="back-link">
+				<ArrowLeft size={16} />
+			</a>
+		</nav>
 
-	<header class="module-header">
-		<div class="header-content">
-			<div class="header-icon">
-				<Headphones />
+		<header class="dashboard-header">
+			<div class="header-welcome">
+				<div class="title-row">
+					<h1>Hören</h1>
+					<span class="level-text">{data.selectedLevel}</span>
+				</div>
+				<p>Practice with fixed-time audio flow for each Teil, then take the full listening simulation.</p>
 			</div>
-			<div class="header-text">
-				<h1>Hören</h1>
-				<p class="header-subtitle">Listening Module</p>
+			<a
+				href="/hoeren/practice?mode=full&level={data.selectedLevel}"
+				class="btn btn-secondary header-full-test-btn"
+			>
+				<span class="cta-play-icon" aria-hidden="true"></span>
+				Full Listening Test
+			</a>
+		</header>
+
+		<section class="time-rule-card" aria-label="Listening time rule">
+			<div class="rule-head">
+				<Timer size={16} />
+				<h2>Listening Time Rule</h2>
 			</div>
-		</div>
-		<div class="header-meta">
-			<span class="meta-badge"><Clock3 size={15} /> 40 min</span>
-			<span class="meta-badge"><ClipboardList size={15} /> 4 Teile</span>
-			<span class="meta-badge progress">68% mastery</span>
-		</div>
-	</header>
+			<ul>
+				<li>Each Teil has fixed time.</li>
+				<li>No pause, rewind, or extension.</li>
+				<li>Audio controls when start and stop happen.</li>
+				<li>Answer while listening or in short pauses.</li>
+			</ul>
+		</section>
 
-	<Separator.Root decorative class="section-divider" />
+		<section class="teile-section">
+			<div class="section-head">
+				<h2>Practice by Teil</h2>
+			</div>
 
-	<section class="teile-section">
-		<h2>Select a Teil to Practice</h2>
-		<p>Train your ear with different audio formats</p>
+			<div class="modules-grid">
+				{#each levelConfig.teile as teil}
+					<article class="module-widget">
+						<div class="widget-header">
+							<div class="widget-header-main">
+								<div class="widget-icon listening">
+									<Headphones size={20} />
+								</div>
+								<div class="widget-title">
+									<h3>{teil.title}</h3>
+									<span class="widget-subtitle">{teil.name}</span>
+									<p class="teil-description">{teil.description}</p>
+								</div>
+							</div>
+						</div>
 
-		<Tabs.Root bind:value={selectedTeil} class="teile-tabs">
-			<Tabs.List class="teile-list">
-				{#each teile as teil}
-					<Tabs.Trigger value={teil.id} class="teil-trigger">
-						<span class="teil-num">{teil.name}</span>
-					</Tabs.Trigger>
+						<div class="widget-footer">
+							<span class="last-session">
+								<Headphones size={14} />
+								{teil.listenRule}
+							</span>
+							<a
+								href="/hoeren/practice?mode=teil&teil={teil.id}&level={data.selectedLevel}"
+								class="btn btn-ghost action-btn"
+							>
+								Practice {teil.name}
+								<ArrowRight size={16} />
+							</a>
+						</div>
+					</article>
 				{/each}
-			</Tabs.List>
-
-			{#each teile as teil}
-				<Tabs.Content value={teil.id} class="teil-content">
-					<div class="teil-card">
-						<div class="teil-header">
-							<div>
-								<span class="teil-badge">{teil.name}</span>
-								<h3>{teil.title}</h3>
-							</div>
-							<div class="teil-meta">
-								<span><Clock3 size={14} /> {teil.duration}</span>
-								<span><ClipboardList size={14} /> {teil.tasks}</span>
-							</div>
-						</div>
-						<p class="teil-description">{teil.description}</p>
-						<div class="teil-skills">
-							{#each teil.skills as skill}
-								<span class="skill-chip">{skill}</span>
-							{/each}
-						</div>
-						<a href="/hoeren/practice?teil={teil.id}" class="teil-cta">
-							Start {teil.name}
-							<ArrowRight size={16} />
-						</a>
-					</div>
-				</Tabs.Content>
-			{/each}
-		</Tabs.Root>
-	</section>
-
-	<section class="full-test-section">
-		<div class="full-test-card">
-			<div>
-				<h3><Headphones size={18} /> Full Listening Test</h3>
-				<p>Complete all 4 Teile under exam conditions</p>
 			</div>
-			<a href="/hoeren/practice?mode=full" class="btn btn-primary">Start Full Test</a>
-		</div>
-	</section>
+		</section>
+	</main>
 </div>
 
 <style>
-	.page-container {
+	.app-shell {
 		min-height: 100vh;
-		padding: var(--space-lg);
-		max-width: 1000px;
+		background: var(--bg-primary);
+		padding-bottom: var(--space-2xl);
+	}
+
+	.dashboard-content {
+		max-width: 920px;
 		margin: 0 auto;
-	}
-
-	.back-nav { margin-bottom: var(--space-xl); }
-	.back-link {
-		display: inline-flex; align-items: center; gap: var(--space-sm);
-		color: var(--text-secondary); font-weight: 500;
-		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md); transition: all var(--transition-fast);
-	}
-	.back-link:hover { color: var(--text-primary); background: var(--bg-card); }
-
-	.module-header {
-		display: flex; justify-content: space-between; align-items: flex-start;
-		gap: var(--space-lg); animation: slideUp 0.5s ease forwards;
-	}
-	.header-content { display: flex; align-items: center; gap: var(--space-lg); }
-	.header-icon {
 		padding: var(--space-lg);
-		background: var(--listening-glow); border-radius: var(--radius-xl);
 	}
-	.header-icon :global(svg) { width: 3rem; height: 3rem; }
-	.header-text h1 { font-size: 2.5rem; color: var(--listening-primary); margin: 0; }
-	.header-subtitle { font-size: 1.125rem; color: var(--text-secondary); margin: var(--space-xs) 0 0; }
-	.header-meta { display: flex; gap: var(--space-sm); }
-	.meta-badge {
-		display: flex; align-items: center; gap: var(--space-xs);
-		padding: var(--space-sm) var(--space-md);
-		background: var(--bg-card); border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-full); font-size: 0.875rem; color: var(--text-secondary);
-	}
-	.meta-badge.progress { background: var(--listening-glow); border-color: var(--listening-primary); color: var(--listening-secondary); }
 
-	:global(.section-divider) { height: 1px; background: var(--border-subtle); margin: var(--space-xl) 0; border: none; }
+	.top-nav {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		margin-bottom: var(--space-md);
+	}
 
-	.teile-section { animation: slideUp 0.5s ease forwards; }
-	.teile-section h2 { margin-bottom: var(--space-xs); }
-	.teile-section > p { color: var(--text-secondary); margin-bottom: var(--space-xl); }
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+		color: var(--text-secondary);
+		font-weight: 500;
+		font-size: 0.9rem;
+	}
 
-	:global(.teile-list) {
-		display: flex; gap: var(--space-sm); padding: var(--space-sm);
-		background: var(--bg-card); border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-lg); margin-bottom: var(--space-lg);
+	.back-link:hover {
+		color: var(--text-primary);
 	}
-	:global(.teil-trigger) {
-		flex: 1; padding: var(--space-md);
-		background: transparent; border: none; border-radius: var(--radius-md);
-		cursor: pointer; transition: all var(--transition-fast);
-		font-weight: 600; color: var(--text-secondary);
-	}
-	:global(.teil-trigger:hover) { background: var(--bg-elevated); color: var(--text-primary); }
-	:global(.teil-trigger[data-state="active"]) { background: var(--listening-glow); color: var(--listening-primary); }
 
-	:global(.teil-content) { animation: scaleIn 0.3s ease forwards; }
-	.teil-card {
-		background: var(--bg-card); border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl); padding: var(--space-xl);
+	.level-text {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--listening-primary) 78%, #334155);
 	}
-	.teil-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-lg); }
-	.teil-badge {
-		display: inline-block; font-size: 0.75rem; font-weight: 600;
-		text-transform: uppercase; letter-spacing: 0.05em;
-		padding: var(--space-xs) var(--space-sm);
-		background: var(--listening-primary); color: white;
-		border-radius: var(--radius-sm); margin-bottom: var(--space-sm);
-	}
-	.teil-header h3 { margin: 0; font-size: 1.5rem; }
-	.teil-meta { display: flex; gap: var(--space-md); font-size: 0.875rem; color: var(--text-muted); }
-	.teil-meta span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-	.teil-description { color: var(--text-secondary); line-height: 1.6; }
-	.teil-skills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-lg); }
-	.skill-chip {
-		padding: var(--space-xs) var(--space-md);
-		background: var(--bg-elevated); border-radius: var(--radius-full);
-		font-size: 0.875rem; color: var(--text-secondary);
-	}
-	.teil-cta {
-		display: flex; align-items: center; justify-content: space-between;
-		margin-top: var(--space-lg); padding: var(--space-md) var(--space-lg);
-		background: var(--listening-primary); color: white;
-		border-radius: var(--radius-md); font-weight: 600;
-		transition: all var(--transition-fast);
-	}
-	.teil-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--listening-glow); }
 
-	.full-test-section { margin-top: var(--space-2xl); }
-	.full-test-card {
-		display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg);
-		padding: var(--space-xl); background: var(--bg-card);
-		border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
+	.dashboard-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: var(--space-xl);
+		padding-bottom: var(--space-lg);
+		border-bottom: 1px solid var(--border-subtle);
 	}
-	.full-test-card h3 { margin: 0; display: flex; align-items: center; gap: var(--space-sm); }
-	.full-test-card p { margin: var(--space-xs) 0 0; color: var(--text-secondary); }
+
+	.header-welcome h1 {
+		font-size: 2rem;
+		margin: 0;
+		color: var(--listening-primary);
+	}
+
+	.title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-bottom: 0.35rem;
+		flex-wrap: wrap;
+	}
+
+	.header-welcome p {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.header-full-test-btn {
+		background: color-mix(in srgb, var(--listening-primary) 10%, white);
+		color: color-mix(in srgb, var(--listening-primary) 82%, #0f172a);
+		border: 2px solid var(--listening-primary);
+		white-space: nowrap;
+		border-radius: var(--radius-full);
+		min-height: 46px;
+		padding: 0.65rem 1.1rem;
+		font-weight: 600;
+	}
+
+	.header-full-test-btn:hover {
+		background: color-mix(in srgb, var(--listening-primary) 16%, white);
+		color: color-mix(in srgb, var(--listening-primary) 88%, #0f172a);
+		border-color: color-mix(in srgb, var(--listening-primary) 88%, #0f172a);
+	}
+
+	.time-rule-card {
+		margin-bottom: var(--space-lg);
+		padding: var(--space-md);
+		background: white;
+		border: 1px solid var(--border-subtle);
+		border-left: 3px solid var(--listening-primary);
+		border-radius: var(--radius-md);
+	}
+
+	.rule-head {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--listening-primary);
+		margin-bottom: 0.35rem;
+	}
+
+	.rule-head h2 {
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	.time-rule-card ul {
+		margin: 0;
+		padding-left: 1.2rem;
+		color: var(--text-secondary);
+		font-size: 0.9rem;
+	}
+
+	.section-head {
+		margin-bottom: var(--space-md);
+	}
+
+	.section-head h2 {
+		margin: 0;
+		font-size: 1.1rem;
+		color: var(--text-muted);
+		font-weight: 600;
+	}
+
+	.modules-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: var(--space-md);
+	}
+
+	.module-widget {
+		background: white;
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		padding: var(--space-lg);
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s ease;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		min-height: 0;
+	}
+
+	.module-widget:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-md);
+		border-color: var(--border-default);
+	}
+
+	.widget-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-md);
+	}
+
+	.widget-header-main {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+		min-width: 0;
+	}
+
+	.widget-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: var(--radius-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.widget-icon.listening {
+		background: color-mix(in srgb, var(--listening-primary) 12%, white);
+		color: color-mix(in srgb, var(--listening-primary) 72%, #334155);
+	}
+
+	.widget-title {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.widget-title h3 {
+		font-size: 1.05rem;
+		margin: 0;
+	}
+
+	.widget-subtitle {
+		display: inline-block;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+		margin-top: 0.1rem;
+	}
+
+	.teil-description {
+		margin: 0.4rem 0 0;
+		font-size: 0.9rem;
+		line-height: 1.45;
+		color: var(--text-secondary);
+	}
+
+	.widget-footer {
+		margin-top: auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-top: var(--space-md);
+		border-top: 1px solid var(--border-subtle);
+		gap: var(--space-sm);
+	}
+
+	.last-session {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.action-btn {
+		font-size: 0.8rem;
+		padding: 0.35rem 0.75rem;
+		gap: 0.25rem;
+	}
 
 	@media (max-width: 768px) {
-		.module-header { flex-direction: column; }
-		.header-meta { flex-wrap: wrap; }
-		:global(.teile-list) { flex-wrap: wrap; }
-		.full-test-card { flex-direction: column; text-align: center; }
+		.dashboard-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 1rem;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.widget-footer {
+			flex-wrap: wrap;
+		}
+
+		.header-full-test-btn {
+			width: 100%;
+			justify-content: center;
+		}
 	}
 </style>
