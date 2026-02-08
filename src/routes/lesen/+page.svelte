@@ -1,419 +1,345 @@
 <script lang="ts">
-	import { Separator, Tabs, Progress } from "bits-ui";
-	import {
-		ArrowLeft,
-		ArrowRight,
-		BookOpen,
-		ClipboardList,
-		Clock3
-	} from "@lucide/svelte";
+	import { ArrowLeft, ArrowRight, BookOpen, Clock3 } from "@lucide/svelte";
+	import type { PageData } from "./$types";
 
-	const teile = [
+	type ReadingTeil = {
+		id: string;
+		name: string;
+		title: string;
+		duration: string;
+		tasks: string;
+		description: string;
+	};
+
+	let { data }: { data: PageData } = $props();
+
+	const teile: ReadingTeil[] = [
 		{
 			id: "teil1",
 			name: "Teil 1",
 			title: "Korrespondenz",
-			description:
-				"Read two short texts and answer multiple choice questions about their content.",
 			duration: "10 min",
 			tasks: "6 items",
-			skills: [
-				"Understanding main ideas",
-				"Finding specific information",
-			],
+			description: "Read short practical messages and pick the best answer for each situation."
 		},
 		{
 			id: "teil2",
 			name: "Teil 2",
 			title: "Presse",
-			description:
-				"Read a longer article and match headlines or statements to paragraphs.",
 			duration: "20 min",
 			tasks: "6 items",
-			skills: ["Understanding structure", "Topic identification"],
+			description: "Work through a longer article and match statements with the right sections."
 		},
 		{
 			id: "teil3",
 			name: "Teil 3",
 			title: "Alltagssituationen",
-			description:
-				"Read short situational texts and answer true/false questions.",
 			duration: "10 min",
 			tasks: "7 items",
-			skills: ["Detail extraction", "Understanding context"],
+			description: "Read short everyday texts and decide if each statement is true or false."
 		},
 		{
 			id: "teil4",
 			name: "Teil 4",
 			title: "Meinungen",
-			description:
-				"Read opinion texts from different people and match statements to speakers.",
 			duration: "15 min",
 			tasks: "6 items",
-			skills: ["Distinguishing opinions", "Comparing viewpoints"],
+			description: "Compare opinions from multiple speakers and match each viewpoint correctly."
 		},
 		{
 			id: "teil5",
 			name: "Teil 5",
 			title: "Formelle Korrespondenz",
-			description:
-				"Read a formal text with gaps and choose the correct words to fill them.",
 			duration: "10 min",
 			tasks: "5 items",
-			skills: ["Grammar in context", "Formal register"],
-		},
+			description: "Complete a formal text by choosing the best word or phrase in each gap."
+		}
 	];
-
-	let selectedTeil = $state("teil1");
 </script>
 
 <svelte:head>
 	<title>Lesen | Goethe Prüfung Practice</title>
+	<meta name="description" content="Practice the reading module for your Goethe exam." />
 </svelte:head>
 
-<div class="page-container">
-	<nav class="back-nav">
-		<a href="/" class="back-link">
-			<ArrowLeft class="back-icon" />
-			<span>Back to Dashboard</span>
-		</a>
-	</nav>
+<div class="app-shell">
+	<main class="dashboard-content">
+		<nav class="top-nav">
+			<a href="/" class="back-link">
+				<ArrowLeft size={16} />
+			</a>
+		</nav>
 
-	<header class="module-header reading">
-		<div class="header-content">
-			<div class="header-icon">
-				<BookOpen />
+		<header class="dashboard-header">
+			<div class="header-welcome">
+				<div class="title-row">
+					<h1>Lesen</h1>
+					<span class="level-text">{data.selectedLevel}</span>
+				</div>
+				<p>Build reading accuracy Teil by Teil, then run the full simulation in one sitting.</p>
 			</div>
-			<div class="header-text">
-				<h1>Lesen</h1>
-				<p class="header-subtitle">Reading Module</p>
-			</div>
-		</div>
-		<div class="header-meta">
-			<span class="meta-badge"><Clock3 class="badge-icon" /> 65 min</span>
-			<span class="meta-badge"><ClipboardList class="badge-icon" /> 5 Teile</span>
-			<span class="meta-badge progress">71% mastery</span>
-		</div>
-	</header>
-
-	<Separator.Root decorative class="section-divider" />
-
-	<section class="teile-section">
-		<h2>Select a Teil to Practice</h2>
-		<p>Each Teil tests different reading skills</p>
-
-		<Tabs.Root bind:value={selectedTeil} class="teile-tabs">
-			<Tabs.List class="teile-list">
-				{#each teile as teil}
-					<Tabs.Trigger value={teil.id} class="teil-trigger">
-						<span class="teil-num">{teil.name}</span>
-					</Tabs.Trigger>
-				{/each}
-			</Tabs.List>
-
-			{#each teile as teil}
-				<Tabs.Content value={teil.id} class="teil-content">
-					<div class="teil-card">
-						<div class="teil-header">
-							<div>
-								<span class="teil-badge">{teil.name}</span>
-								<h3>{teil.title}</h3>
-							</div>
-							<div class="teil-meta">
-								<span><Clock3 class="meta-icon" /> {teil.duration}</span>
-								<span><ClipboardList class="meta-icon" /> {teil.tasks}</span>
-							</div>
-						</div>
-						<p class="teil-description">{teil.description}</p>
-						<div class="teil-skills">
-							{#each teil.skills as skill}
-								<span class="skill-chip">{skill}</span>
-							{/each}
-						</div>
-						<a
-							href="/lesen/practice?teil={teil.id}"
-							class="teil-cta"
-						>
-							Start {teil.name}
-							<ArrowRight class="cta-icon" />
-						</a>
-					</div>
-				</Tabs.Content>
-			{/each}
-		</Tabs.Root>
-	</section>
-
-	<section class="full-test-section">
-		<div class="full-test-card">
-			<div>
-				<h3><BookOpen class="title-icon" /> Full Reading Test</h3>
-				<p>Complete all 5 Teile under exam conditions</p>
-			</div>
-			<a href="/lesen/practice?mode=full" class="btn btn-primary"
-				>Start Full Test</a
+			<a
+				href="/lesen/practice?mode=full&level={data.selectedLevel}"
+				class="btn btn-secondary header-full-test-btn"
 			>
-		</div>
-	</section>
+				<span class="cta-play-icon" aria-hidden="true"></span>
+				Full Reading Test
+			</a>
+		</header>
+
+		<section class="teile-section">
+			<div class="section-head">
+				<h2>Practice by Teil</h2>
+			</div>
+
+			<div class="modules-grid">
+				{#each teile as teil}
+					<article class="module-widget">
+						<div class="widget-header">
+							<div class="widget-header-main">
+								<div class="widget-icon reading">
+									<BookOpen size={20} />
+								</div>
+								<div class="widget-title">
+									<h3>{teil.title}</h3>
+									<span class="widget-subtitle">{teil.name}</span>
+									<p class="teil-description">{teil.description}</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="widget-footer">
+							<span class="last-session">
+								<Clock3 size={14} />
+								{teil.duration} - {teil.tasks}
+							</span>
+							<a
+								href="/lesen/practice?mode=teil&teil={teil.id}&level={data.selectedLevel}"
+								class="btn btn-ghost action-btn"
+							>
+								Practice {teil.name}
+								<ArrowRight size={16} />
+							</a>
+						</div>
+					</article>
+				{/each}
+			</div>
+		</section>
+	</main>
 </div>
 
 <style>
-	.page-container {
+	.app-shell {
 		min-height: 100vh;
-		padding: var(--space-lg);
-		max-width: 1000px;
-		margin: 0 auto;
+		background: var(--bg-primary);
+		padding-bottom: var(--space-2xl);
 	}
 
-	.back-nav {
-		margin-bottom: var(--space-xl);
+	.dashboard-content {
+		max-width: 920px;
+		margin: 0 auto;
+		padding: var(--space-lg);
 	}
+
+	.top-nav {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		margin-bottom: var(--space-md);
+	}
+
 	.back-link {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 		color: var(--text-secondary);
 		font-weight: 500;
-		padding: var(--space-sm) var(--space-md);
-		border-radius: var(--radius-md);
-		transition: all var(--transition-fast);
+		font-size: 0.9rem;
 	}
+
 	.back-link:hover {
 		color: var(--text-primary);
-		background: var(--bg-card);
-	}
-	.back-icon {
-		width: 1.25rem;
-		height: 1.25rem;
 	}
 
-	.module-header {
+	.level-text {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: color-mix(in srgb, var(--reading-primary) 78%, #334155);
+	}
+
+	.dashboard-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;
-		gap: var(--space-lg);
-		animation: slideUp 0.5s ease forwards;
-	}
-	.header-content {
-		display: flex;
-		align-items: center;
-		gap: var(--space-lg);
-	}
-	.header-icon {
-		padding: var(--space-lg);
-		background: var(--reading-glow);
-		border-radius: var(--radius-xl);
-	}
-	.header-icon :global(svg) {
-		width: 3rem;
-		height: 3rem;
-	}
-	.header-text h1 {
-		font-size: 2.5rem;
-		color: var(--reading-primary);
-		margin: 0;
-	}
-	.header-subtitle {
-		font-size: 1.125rem;
-		color: var(--text-secondary);
-		margin: var(--space-xs) 0 0;
-	}
-	.header-meta {
-		display: flex;
-		gap: var(--space-sm);
-	}
-	.meta-badge {
-		display: flex;
-		align-items: center;
-		gap: var(--space-xs);
-		padding: var(--space-sm) var(--space-md);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-full);
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-	.badge-icon {
-		width: 0.95rem;
-		height: 0.95rem;
-	}
-	.meta-badge.progress {
-		background: var(--reading-glow);
-		border-color: var(--reading-primary);
-		color: var(--reading-secondary);
-	}
-
-	.section-divider {
-		height: 1px;
-		background: var(--border-subtle);
-		margin: var(--space-xl) 0;
-		border: none;
-	}
-
-	.teile-section {
-		animation: slideUp 0.5s ease forwards;
-	}
-	.teile-section h2 {
-		margin-bottom: var(--space-xs);
-	}
-	.teile-section > p {
-		color: var(--text-secondary);
+		align-items: flex-end;
 		margin-bottom: var(--space-xl);
+		padding-bottom: var(--space-lg);
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
-	.teile-list {
+	.header-welcome h1 {
+		font-size: 2rem;
+		margin: 0;
+		color: var(--reading-primary);
+	}
+
+	.title-row {
 		display: flex;
-		gap: var(--space-sm);
-		padding: var(--space-sm);
-		background: var(--bg-card);
+		align-items: center;
+		gap: 0.6rem;
+		margin-bottom: 0.35rem;
+		flex-wrap: wrap;
+	}
+
+	.header-welcome p {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.header-full-test-btn {
+		background: color-mix(in srgb, var(--reading-primary) 10%, white);
+		color: color-mix(in srgb, var(--reading-primary) 82%, #0f172a);
+		border: 2px solid var(--reading-primary);
+		white-space: nowrap;
+		border-radius: var(--radius-full);
+		min-height: 46px;
+		padding: 0.65rem 1.1rem;
+		font-weight: 600;
+	}
+
+	.header-full-test-btn:hover {
+		background: color-mix(in srgb, var(--reading-primary) 16%, white);
+		color: color-mix(in srgb, var(--reading-primary) 88%, #0f172a);
+		border-color: color-mix(in srgb, var(--reading-primary) 88%, #0f172a);
+	}
+
+	.section-head {
+		margin-bottom: var(--space-md);
+	}
+
+	.section-head h2 {
+		margin: 0;
+		font-size: 1.1rem;
+		color: var(--text-muted);
+		font-weight: 600;
+	}
+
+	.modules-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: var(--space-md);
+	}
+
+	.module-widget {
+		background: white;
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-lg);
-		margin-bottom: var(--space-lg);
-	}
-	.teil-trigger {
-		flex: 1;
-		padding: var(--space-md);
-		background: transparent;
-		border: none;
-		border-radius: var(--radius-md);
-		cursor: pointer;
-		transition: all var(--transition-fast);
-		font-weight: 600;
-		color: var(--text-secondary);
-	}
-	.teil-trigger:hover {
-		background: var(--bg-elevated);
-		color: var(--text-primary);
-	}
-	:global(.teil-trigger[data-state="active"]) {
-		background: var(--reading-glow);
-		color: var(--reading-primary);
+		padding: var(--space-lg);
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s ease;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		min-height: 0;
 	}
 
-	.teil-content {
-		animation: scaleIn 0.3s ease forwards;
-	}
-	.teil-card {
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
-		padding: var(--space-xl);
-	}
-	.teil-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: var(--space-lg);
-	}
-	.teil-badge {
-		display: inline-block;
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding: var(--space-xs) var(--space-sm);
-		background: var(--reading-primary);
-		color: white;
-		border-radius: var(--radius-sm);
-		margin-bottom: var(--space-sm);
-	}
-	.teil-header h3 {
-		margin: 0;
-		font-size: 1.5rem;
-	}
-	.teil-meta {
-		display: flex;
-		gap: var(--space-md);
-		font-size: 0.875rem;
-		color: var(--text-muted);
-	}
-	.teil-meta span {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-xs);
-	}
-	.meta-icon {
-		width: 0.9rem;
-		height: 0.9rem;
-	}
-	.teil-description {
-		color: var(--text-secondary);
-		line-height: 1.6;
-	}
-	.teil-skills {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-xs);
-		margin-top: var(--space-lg);
-	}
-	.skill-chip {
-		padding: var(--space-xs) var(--space-md);
-		background: var(--bg-elevated);
-		border-radius: var(--radius-full);
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-	.teil-cta {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-top: var(--space-lg);
-		padding: var(--space-md) var(--space-lg);
-		background: var(--reading-primary);
-		color: white;
-		border-radius: var(--radius-md);
-		font-weight: 600;
-		transition: all var(--transition-fast);
-	}
-	.teil-cta:hover {
+	.module-widget:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 8px 24px var(--reading-glow);
-	}
-	.cta-icon {
-		width: 1rem;
-		height: 1rem;
+		box-shadow: var(--shadow-md);
+		border-color: var(--border-default);
 	}
 
-	.full-test-section {
-		margin-top: var(--space-2xl);
-	}
-	.full-test-card {
+	.widget-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-lg);
-		padding: var(--space-xl);
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-xl);
+		gap: var(--space-md);
 	}
-	.full-test-card h3 {
-		margin: 0;
+
+	.widget-header-main {
 		display: flex;
 		align-items: center;
+		gap: var(--space-md);
+		min-width: 0;
+	}
+
+	.widget-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: var(--radius-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.widget-icon.reading {
+		background: color-mix(in srgb, var(--reading-primary) 12%, white);
+		color: color-mix(in srgb, var(--reading-primary) 72%, #334155);
+	}
+
+	.widget-title {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.widget-title h3 {
+		font-size: 1.05rem;
+		margin: 0;
+	}
+
+	.widget-subtitle {
+		display: inline-block;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+		margin-top: 0.1rem;
+	}
+
+	.teil-description {
+		margin: 0.4rem 0 0;
+		font-size: 0.9rem;
+		line-height: 1.45;
+		color: var(--text-secondary);
+	}
+
+	.widget-footer {
+		margin-top: auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-top: var(--space-md);
+		border-top: 1px solid var(--border-subtle);
 		gap: var(--space-sm);
 	}
-	.title-icon {
-		width: 1.2rem;
-		height: 1.2rem;
+
+	.last-session {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		gap: 4px;
 	}
-	.full-test-card p {
-		margin: var(--space-xs) 0 0;
-		color: var(--text-secondary);
+
+	.action-btn {
+		font-size: 0.8rem;
+		padding: 0.35rem 0.75rem;
+		gap: 0.25rem;
 	}
 
 	@media (max-width: 768px) {
-		.module-header {
+		.dashboard-header {
 			flex-direction: column;
+			align-items: flex-start;
+			gap: 1rem;
 		}
-		.header-meta {
+	}
+
+	@media (max-width: 520px) {
+		.widget-footer {
 			flex-wrap: wrap;
 		}
-		.teile-list {
-			flex-wrap: wrap;
-		}
-		.full-test-card {
-			flex-direction: column;
-			text-align: center;
+
+		.header-full-test-btn {
+			width: 100%;
+			justify-content: center;
 		}
 	}
 </style>
