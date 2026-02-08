@@ -64,6 +64,8 @@
 			accent: "speaking"
 		}
 	];
+	const cefrLevels = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
+	let selectedLevel = $state("B1");
 
 	let authModalOpen = $state(false);
 
@@ -71,6 +73,10 @@
 		if (form?.message) {
 			authModalOpen = true;
 		}
+	});
+
+	$effect(() => {
+		selectedLevel = data.selectedLevel;
 	});
 
 	const openAuthModal = (event: MouseEvent) => {
@@ -86,6 +92,11 @@
 		if (event.target === event.currentTarget) {
 			authModalOpen = false;
 		}
+	};
+
+	const submitLevelChange = (event: Event) => {
+		const target = event.currentTarget as HTMLSelectElement;
+		target.form?.requestSubmit();
 	};
 
 </script>
@@ -191,12 +202,24 @@
 			<header class="dashboard-header">
 				<div class="header-welcome">
 					<h1>Guten Tag, {data.user?.name ?? "Learner"}</h1>
-					<p>Ready to continue your B1 preparation?</p>
+					<p>Ready to continue your {data.selectedLevel} preparation?</p>
 				</div>
 				<div class="header-stats">
 					<div class="stat-card">
-						<span class="stat-label">CEFR Level</span>
-						<span class="stat-value">B1</span>
+						<form method="POST" action="?/updateLevel" class="level-form">
+							<label class="stat-label" for="cefr-level">CEFR Level</label>
+							<select
+								id="cefr-level"
+								name="level"
+								class="level-select"
+								bind:value={selectedLevel}
+								onchange={submitLevelChange}
+							>
+								{#each cefrLevels as level}
+									<option value={level}>{level}</option>
+								{/each}
+							</select>
+						</form>
 					</div>
 					<!-- <div class="stat-card">
 						<span class="stat-label">Exam Date</span>
@@ -546,6 +569,13 @@
 		align-items: flex-end;
 	}
 
+	.level-form {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.35rem;
+	}
+
 	.stat-label {
 		font-size: 0.75rem;
 		text-transform: uppercase;
@@ -558,6 +588,26 @@
 		font-size: 1.25rem;
 		font-weight: 700;
 		color: var(--text-primary);
+	}
+
+	.level-select {
+		font: inherit;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		background: var(--bg-card);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-sm);
+		padding: 0.35rem 0.6rem;
+		min-width: 4.5rem;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	.level-select:focus {
+		outline: none;
+		border-color: var(--reading-primary);
+		box-shadow: 0 0 0 2px color-mix(in oklab, var(--reading-primary) 20%, transparent);
 	}
 
 	.text-muted { color: var(--text-muted); }

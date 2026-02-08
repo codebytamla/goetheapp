@@ -1,8 +1,19 @@
 import { fail } from "@sveltejs/kit";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/d1";
 
 import { createAuth, type AuthEnv } from "$lib/server/auth";
+import { userPreference } from "$lib/server/user-preference-schema";
 
 import type { Actions, PageServerLoad } from "./$types";
+
+const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
+type CefrLevel = (typeof CEFR_LEVELS)[number];
+const DEFAULT_CEFR_LEVEL: CefrLevel = "B1";
+
+function isCefrLevel(value: string): value is CefrLevel {
+	return CEFR_LEVELS.includes(value as CefrLevel);
+}
 
 function asMessage(error: unknown): string {
 	if (error instanceof Error) {
@@ -18,7 +29,8 @@ export const load: PageServerLoad = async (event) => {
 			isAuthenticated: false,
 			user: null,
 			session: null,
-			googleEnabled: false
+			googleEnabled: false,
+			selectedLevel: DEFAULT_CEFR_LEVEL
 		};
 	}
 
@@ -28,12 +40,27 @@ export const load: PageServerLoad = async (event) => {
 		const session = await auth.api.getSession({
 			headers: event.request.headers
 		});
+		const db = drizzle(env.DB);
+		let selectedLevel: CefrLevel = DEFAULT_CEFR_LEVEL;
+
+		if (session?.user?.id) {
+			const [preference] = await db
+				.select({ cefrLevel: userPreference.cefrLevel })
+				.from(userPreference)
+				.where(eq(userPreference.userId, session.user.id))
+				.limit(1);
+
+			if (preference?.cefrLevel && isCefrLevel(preference.cefrLevel)) {
+				selectedLevel = preference.cefrLevel;
+			}
+		}
 
 		return {
 			isAuthenticated: Boolean(session?.user),
 			user: session?.user ?? null,
 			session: session?.session ?? null,
-			googleEnabled: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
+			googleEnabled: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+			selectedLevel
 		};
 	} catch (error) {
 		console.error("[home] Failed to load auth session", error);
@@ -41,7 +68,8 @@ export const load: PageServerLoad = async (event) => {
 			isAuthenticated: false,
 			user: null,
 			session: null,
-			googleEnabled: false
+			googleEnabled: false,
+			selectedLevel: DEFAULT_CEFR_LEVEL
 		};
 	}
 };
@@ -90,6 +118,63 @@ export const actions: Actions = {
 			status: "success",
 			message: `Magic link sent to ${email}.`,
 			email
+		};
+	},
+	updateLevel: async (event) => {
+		if (!event.platform?.env) {
+			return fail(500, {
+				levelStatus: "error",
+				levelMessage: "Preferences runtime is unavailable."
+			});
+		}
+
+		const env = event.platform.env as AuthEnv;
+		const auth = createAuth(env, event.url.origin);
+		const session = await auth.api.getSession({
+			headers: event.request.headers
+		});
+
+		if (!session?.user?.id) {
+			return fail(401, {
+				levelStatus: "error",
+				levelMessage: "You need to sign in to set your level."
+			});
+		}
+
+		const formData = await event.request.formData();
+		const level = String(formData.get("level") ?? "")
+			.trim()
+			.toUpperCase();
+
+		if (!isCefrLevel(level)) {
+			return fail(400, {
+				levelStatus: "error",
+				levelMessage: "Invalid CEFR level."
+			});
+		}
+
+		const db = drizzle(env.DB);
+		const now = new Date();
+
+		await db
+			.insert(userPreference)
+			.values({
+				userId: session.user.id,
+				cefrLevel: level,
+				createdAt: now,
+				updatedAt: now
+			})
+			.onConflictDoUpdate({
+				target: userPreference.userId,
+				set: {
+					cefrLevel: level,
+					updatedAt: now
+				}
+			});
+
+		return {
+			levelStatus: "success",
+			selectedLevel: level
 		};
 	}
 };
